@@ -22,6 +22,7 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     iife: false,
   },
+  target: "node16",
   optimization: {
     minimize: false,
   },
