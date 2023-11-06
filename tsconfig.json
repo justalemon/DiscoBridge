@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "module": "Node16",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "outDir": "dist",
+        "moduleResolution": "Node16",
+        "types": [
+            "@citizenfx/client",
+            "@citizenfx/server",
+            "@types/node"
+        ],
+        "skipLibCheck": true
+    },
+    "include": [
+        "*.ts"
+    ]
+}
