@@ -20,6 +20,9 @@ dependencies:
   discord.js:
     specifier: ^13.16.0
     version: 13.16.0
+  node-fetch:
+    specifier: ^2.7.0
+    version: 2.7.0
   ts-loader:
     specifier: ^9.5.0
     version: 9.5.0(typescript@5.2.2)(webpack@5.89.0)
