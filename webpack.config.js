@@ -1,5 +1,6 @@
 const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
+const { IgnorePlugin } = require("webpack");
 
 module.exports = {
   entry: {
@@ -27,6 +28,18 @@ module.exports = {
     minimize: false,
   },
   plugins: [
+    new IgnorePlugin({
+      resourceRegExp: /zlib-sync/
+    }),
+    new IgnorePlugin({
+      resourceRegExp: /erlpack/
+    }),
+    new IgnorePlugin({
+      resourceRegExp: /bufferutil/
+    }),
+    new IgnorePlugin({
+      resourceRegExp: /utf-8-validate/
+    }),
     new CopyPlugin({
       patterns: [
         "fxmanifest.lua",
