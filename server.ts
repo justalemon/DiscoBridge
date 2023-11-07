@@ -1,8 +1,10 @@
 import { ApplicationCommandTypes, ChannelTypes, Client, CommandInteraction, Guild, InteractionTypes, TextableChannel } from "oceanic.js";
 import { commands } from "./commands";
 
-const client = new Client({auth: "Bot " + GetConvar("discord_token", "")});
-let guild: Guild = null;
+const client = new Client({
+    auth: "Bot " + GetConvar("discord_token", "")
+});
+let guild: Guild = undefined;
 let chatChannel: TextableChannel = null;
 
 async function handleCommands(interaction: CommandInteraction) {
@@ -32,7 +34,14 @@ client.on("ready", async () => {
     console.log(`Logged in as ${client.user.tag}`);
     await client.application.bulkEditGlobalCommands([...commands.values()]);
 
-    guild = client.guilds.get(GetConvar("discord_guild", "0"));
+    const guildId = GetConvar("discord_guild", "0");
+    try {
+        guild = await client.rest.guilds.get(guildId);
+        console.log(`Using guild "${guild.name}" (${guild.id})`);
+    } catch (error) {
+        console.error(`Unable get guild ${guildId}: ${error}}`);
+        StopResource(GetCurrentResourceName());
+    }
 });
 
 async function init() {
