@@ -1,23 +1,19 @@
-import { Client, Intents } from "discord.js";
+import { Client } from "oceanic.js";
 
-const client = new Client({intents: [Intents.FLAGS.GUILDS]});
+let client = new Client({auth: "Bot " + GetConvar("discord_token", "")});
 
-client.on("ready", () => {
+client.on("ready", async () => {
     console.log(`Logged in as ${client.user.tag}`);
 });
 
-function reconnect() {
+async function init() {
     console.log("Logging into Discord...");
-    client.login(GetConvar("discord_token", ""));
-}
 
-function reconnectCommand(source: number, args: string[], raw: string) {
-    reconnect();
-}
-
-function init() {
-    RegisterCommand("dreconnect", reconnectCommand, true);
-    reconnect();
+    try {
+        await client.connect();
+    } catch (error) {
+        console.error(`Unable to log into Discord: ${error}`);
+    }
 }
 
 setImmediate(init);

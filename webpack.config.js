@@ -29,16 +29,16 @@ module.exports = {
   },
   plugins: [
     new IgnorePlugin({
+      resourceRegExp: /pako/
+    }),
+    new IgnorePlugin({
       resourceRegExp: /zlib-sync/
     }),
     new IgnorePlugin({
       resourceRegExp: /erlpack/
     }),
     new IgnorePlugin({
-      resourceRegExp: /bufferutil/
-    }),
-    new IgnorePlugin({
-      resourceRegExp: /utf-8-validate/
+      resourceRegExp: /ffmpeg-static/
     }),
     new CopyPlugin({
       patterns: [
