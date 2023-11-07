@@ -1,7 +1,9 @@
-import { ApplicationCommandTypes, Client, CommandInteraction, InteractionTypes } from "oceanic.js";
+import { ApplicationCommandTypes, ChannelTypes, Client, CommandInteraction, Guild, InteractionTypes, TextableChannel } from "oceanic.js";
 import { commands } from "./commands";
 
 const client = new Client({auth: "Bot " + GetConvar("discord_token", "")});
+let guild: Guild = null;
+let chatChannel: TextableChannel = null;
 
 async function handleCommands(interaction: CommandInteraction) {
     const command = commands.get(interaction.data.name);
@@ -29,6 +31,8 @@ client.on("interactionCreate", async (interaction) => {
 client.on("ready", async () => {
     console.log(`Logged in as ${client.user.tag}`);
     await client.application.bulkEditGlobalCommands([...commands.values()]);
+
+    guild = client.guilds.get(GetConvar("discord_guild", "0"));
 });
 
 async function init() {
@@ -40,5 +44,23 @@ async function init() {
         console.error(`Unable to log into Discord: ${error}`);
     }
 }
+
+async function handleChatMessage(source: number, author: string, message: string) {
+    if (chatChannel == null) {
+        const channel = guild.channels.get(GetConvar("discord_chat", "0"));
+
+        if (typeof channel == "undefined" || channel.type != ChannelTypes.GUILD_TEXT) {
+            return;
+        }
+
+        chatChannel = channel;
+    }
+
+    await chatChannel.createMessage({
+        content: `${author}: ${message}`,
+    });
+}
+
+onNet("chatMessage", handleChatMessage);
 
 setImmediate(init);
