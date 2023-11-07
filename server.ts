@@ -42,6 +42,8 @@ async function init() {
         await client.connect();
     } catch (error) {
         console.error(`Unable to log into Discord: ${error}`);
+        StopResource(GetCurrentResourceName());
+        return;
     }
 }
 
