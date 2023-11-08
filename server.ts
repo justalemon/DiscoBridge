@@ -7,8 +7,10 @@ const client = new Client({
         intents: ["GUILD_MESSAGES", "MESSAGE_CONTENT"]
     }
 });
+const consoleChannels: string[] = JSON.parse(GetConvar("discord_consolechannels", `["resources", "svadhesive", "citizen-server-impl", "c-scripting-core", "script:citric"]`));
 let guild: Guild = undefined;
 let chatChannel: TextableChannel = undefined;
+let consoleChannel: TextableChannel = undefined;
 
 async function getChannelFromConvar(convar: string, purpose: string) {
     const channelId = GetConvar(convar, "0");
@@ -83,6 +85,12 @@ client.on("ready", async () => {
     });
 
     chatChannel = await getChannelFromConvar("discord_chat", "chat");
+    consoleChannel = await getChannelFromConvar("discord_console", "console");
+
+    if (typeof consoleChannel != "undefined" && consoleChannels.length > 0) {
+        const channels = consoleChannels.join(", ");
+        console.log(`Allowing ${channels} for the console channel`);
+    }
 });
 
 client.on("messageCreate", async (message: Message) => {
@@ -138,7 +146,17 @@ async function handleChatMessage(source: number, author: string, message: string
         content: `${author}: ${message}`,
     });
 }
-
 onNet("chatMessage", handleChatMessage);
+
+async function handleConsoleMessage(channel: string, message: string) {
+    if (typeof consoleChannel == "undefined" || consoleChannels.indexOf(channel) == -1 || channel.length == 0 || message.length == 0) {
+        return;
+    }
+
+    await chatChannel.createMessage({
+        content: `${channel}: ${message}`,
+    });
+}
+RegisterConsoleListener(handleConsoleMessage);
 
 setImmediate(init);
