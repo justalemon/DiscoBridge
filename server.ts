@@ -7,7 +7,10 @@ const client = new Client({
         intents: ["GUILD_MESSAGES", "MESSAGE_CONTENT"]
     }
 });
+
 const consoleChannels: string[] = JSON.parse(GetConvar("discord_consolechannels", `["resources", "svadhesive", "citizen-server-impl", "c-scripting-core", "script:citric"]`));
+const consoleShowAssets = GetConvarInt("discord_consoleassets", 0) != 0;
+
 let guild: Guild = undefined;
 let chatChannel: TextableChannel = undefined;
 let consoleChannel: TextableChannel = undefined;
@@ -149,13 +152,16 @@ async function handleChatMessage(source: number, author: string, message: string
 onNet("chatMessage", handleChatMessage);
 
 async function handleConsoleMessage(channel: string, message: string) {
-    if (typeof consoleChannel == "undefined" || consoleChannels.indexOf(channel) == -1 || channel.length == 0 || message.length == 0) {
+    // invalidate the messages from our own resource to avoid "RangeError: Maximum call stack size exceeded"
+    if (typeof consoleChannel == "undefined" || channel == "script:discordbridge" || channel.length == 0 || message.length == 0) {
         return;
     }
 
-    await chatChannel.createMessage({
-        content: `${channel}: ${message}`,
-    });
+    if (consoleChannels.indexOf(channel) != -1 || (channel.endsWith(":stream") && consoleShowAssets) ) {
+        await chatChannel.createMessage({
+            content: `${channel}: ${message}`,
+        });
+    }
 }
 RegisterConsoleListener(handleConsoleMessage);
 
