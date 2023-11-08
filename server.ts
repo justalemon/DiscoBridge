@@ -1,4 +1,4 @@
-import { ApplicationCommandTypes, ChannelTypes, Client, CommandInteraction, Guild, InteractionTypes, Member, Message, TextableChannel } from "oceanic.js";
+import { ActivityTypes, ApplicationCommandTypes, ChannelTypes, Client, CommandInteraction, Guild, InteractionTypes, Member, Message, TextableChannel } from "oceanic.js";
 import { commands } from "./commands";
 
 const client = new Client({
@@ -46,6 +46,15 @@ client.on("ready", async () => {
         StopResource(GetCurrentResourceName());
         return;
     }
+
+    setImmediate(() => {
+        client.editStatus("online", [
+            {
+                name: GetConvar("sv_hostname", "a server"),
+                type: ActivityTypes.WATCHING,
+            }
+        ]);
+    });
 
     const channelId = GetConvar("discord_chat", "0");
 
