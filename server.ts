@@ -100,6 +100,8 @@ client.on("messageCreate", async (message: Message) => {
         color: color,
         args: [message.author.username, message.content]
     });
+
+    console.log(`${message.author.username}: ${message.content}`);
 });
 
 async function init() {
