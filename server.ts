@@ -10,6 +10,32 @@ const client = new Client({
 let guild: Guild = undefined;
 let chatChannel: TextableChannel = undefined;
 
+async function getChannelFromConvar(convar: string, purpose: string) {
+    const channelId = GetConvar(convar, "0");
+
+    if (channelId == "0") {
+        return undefined;
+    }
+
+    try {
+        const channel = await client.rest.channels.get(channelId);
+
+        // TODO: Make sure that the channel is part of the guild
+
+        if (channel.type == ChannelTypes.GUILD_TEXT) {
+            chatChannel = channel;
+            console.log(`Using channel ${channel.name} (${channel.id}) as the ${purpose} channel`);
+            return channel;
+        } else {
+            console.error(`Channel ${channel.id} is not a guild text channel!`);
+        }
+    } catch (error) {
+        console.error(`Unable get channel ${channelId}: ${error}}`);
+    }
+
+    return undefined;
+}
+
 async function handleCommands(interaction: CommandInteraction) {
     const command = commands.get(interaction.data.name);
 
@@ -56,26 +82,7 @@ client.on("ready", async () => {
         ]);
     });
 
-    const channelId = GetConvar("discord_chat", "0");
-
-    if (channelId == "0") {
-        return;
-    }
-
-    try {
-        const channel = await client.rest.channels.get(channelId);
-
-        // TODO: Make sure that the channel is part of the guild
-
-        if (channel.type == ChannelTypes.GUILD_TEXT) {
-            chatChannel = channel;
-            console.log(`Using channel ${channel.name} (${channel.id}) as the chat channel`);
-        } else {
-            console.error(`Channel ${channel.id} is not a guild text channel!`);
-        }
-    } catch (error) {
-        console.error(`Unable get channel ${guildId}: ${error}}`);
-    }
+    chatChannel = await getChannelFromConvar("discord_chat", "chat");
 });
 
 client.on("messageCreate", async (message: Message) => {
