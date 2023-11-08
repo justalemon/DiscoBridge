@@ -1,11 +1,14 @@
-import { ApplicationCommandTypes, ChannelTypes, Client, CommandInteraction, Guild, InteractionTypes, TextableChannel } from "oceanic.js";
+import { ApplicationCommandTypes, ChannelTypes, Client, CommandInteraction, Guild, InteractionTypes, Member, Message, TextableChannel } from "oceanic.js";
 import { commands } from "./commands";
 
 const client = new Client({
-    auth: "Bot " + GetConvar("discord_token", "")
+    auth: "Bot " + GetConvar("discord_token", ""),
+    gateway: {
+        intents: ["GUILD_MESSAGES", "MESSAGE_CONTENT"]
+    }
 });
 let guild: Guild = undefined;
-let chatChannel: TextableChannel = null;
+let chatChannel: TextableChannel = undefined;
 
 async function handleCommands(interaction: CommandInteraction) {
     const command = commands.get(interaction.data.name);
@@ -41,7 +44,53 @@ client.on("ready", async () => {
     } catch (error) {
         console.error(`Unable get guild ${guildId}: ${error}}`);
         StopResource(GetCurrentResourceName());
+        return;
     }
+
+    const channelId = GetConvar("discord_chat", "0");
+
+    if (channelId == "0") {
+        return;
+    }
+
+    try {
+        const channel = await client.rest.channels.get(channelId);
+
+        // TODO: Make sure that the channel is part of the guild
+
+        if (channel.type == ChannelTypes.GUILD_TEXT) {
+            chatChannel = channel;
+            console.log(`Using channel ${channel.name} (${channel.id}) as the chat channel`);
+        } else {
+            console.error(`Channel ${channel.id} is not a guild text channel!`);
+        }
+    } catch (error) {
+        console.error(`Unable get channel ${guildId}: ${error}}`);
+    }
+});
+
+client.on("messageCreate", async (message: Message) => {
+    if (typeof chatChannel == "undefined" || message.author.bot) {
+        return;
+    }
+
+    const author = await guild.getMember(message.author.id);
+
+    let color = [255, 255, 255];
+
+    if (author.roles.length > 0) {
+        const roleId = author.roles[0];
+        const role = guild.roles.get(roleId);
+        const r = (role.color & 0xFF);
+        const g = (role.color & 0xFF00) >>> 8;
+        const b = (role.color & 0xFF0000) >>> 16;
+        color = [r, g, b];
+    }
+
+    TriggerClientEvent("chat:addMessage", -1, {
+        color: color,
+        args: [message.author.username, message.content]
+    });
 });
 
 async function init() {
