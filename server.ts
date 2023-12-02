@@ -110,6 +110,13 @@ client.on("ready", async () => {
         const channels = consoleChannels.join(", ");
         console.log(`Allowing ${channels} for the console channel`);
     }
+
+    chatChannel?.createMessage({
+        content: "Chat is ready!"
+    });
+    consoleChannel?.createMessage({
+        content: "Console is ready!"
+    });
 });
 
 client.on("messageCreate", async (message: Message) => {
