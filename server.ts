@@ -1,6 +1,8 @@
 import { ActivityTypes, ApplicationCommandTypes, ChannelTypes, Client, CommandInteraction, Guild, InteractionTypes, JSONMember, Member, Message, TextableChannel } from "oceanic.js";
 import { commands } from "./commands";
 
+const reColor = new RegExp("\^[0-9]", "g");
+
 const client = new Client({
     auth: "Bot " + GetConvar("discord_token", ""),
     gateway: {
@@ -174,7 +176,7 @@ async function handleChatMessage(source: number, author: string, message: string
     }
 
     await chatChannel.createMessage({
-        content: `${author}: ${message}`,
+        content: `${author}: ` + message.replaceAll(reColor, ""),
     });
 }
 
@@ -186,7 +188,7 @@ async function handleConsoleMessage(channel: string, message: string) {
 
     if (consoleChannels.indexOf(channel) != -1 || (channel.endsWith(":stream") && consoleShowAssets) ) {
         await consoleChannel.createMessage({
-            content: `${channel}: ${message}`,
+            content: `${channel}: ` + message.replaceAll(reColor, ""),
         });
     }
 }
