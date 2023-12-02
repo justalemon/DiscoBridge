@@ -43,7 +43,6 @@ async function getChannelFromConvar(convar: string, purpose: string) {
         // TODO: Make sure that the channel is part of the guild
 
         if (channel.type == ChannelTypes.GUILD_TEXT) {
-            chatChannel = channel;
             console.log(`Using channel ${channel.name} (${channel.id}) as the ${purpose} channel`);
             return channel;
         } else {
