@@ -162,18 +162,6 @@ client.on("guildMemberUpdate", async (member: Member, oldMember: null | JSONMemb
     });
 });
 
-async function init() {
-    console.log("Logging into Discord...");
-
-    try {
-        await client.connect();
-    } catch (error) {
-        console.error(`Unable to log into Discord: ${error}`);
-        StopResource(GetCurrentResourceName());
-        return;
-    }
-}
-
 async function handleChatMessage(source: number, author: string, message: string) {
     if (chatChannel == null) {
         const channel = guild.channels.get(GetConvar("discord_chat", "0"));
@@ -189,7 +177,6 @@ async function handleChatMessage(source: number, author: string, message: string
         content: `${author}: ${message}`,
     });
 }
-onNet("chatMessage", handleChatMessage);
 
 async function handleConsoleMessage(channel: string, message: string) {
     // invalidate the messages from our own resource to avoid "RangeError: Maximum call stack size exceeded"
@@ -203,6 +190,20 @@ async function handleConsoleMessage(channel: string, message: string) {
         });
     }
 }
-RegisterConsoleListener(handleConsoleMessage);
 
+async function init() {
+    onNet("chatMessage", handleChatMessage);
+
+    RegisterConsoleListener(handleConsoleMessage);
+
+    console.log("Logging into Discord...");
+
+    try {
+        await client.connect();
+    } catch (error) {
+        console.error(`Unable to log into Discord: ${error}`);
+        StopResource(GetCurrentResourceName());
+        return;
+    }
+}
 setImmediate(init);
