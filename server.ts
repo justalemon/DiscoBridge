@@ -1,13 +1,14 @@
-import { ActivityTypes, ApplicationCommandTypes, ChannelTypes, Client, CommandInteraction, Guild, InteractionTypes, Member, Message, TextableChannel } from "oceanic.js";
+import { ActivityTypes, ApplicationCommandTypes, ChannelTypes, Client, CommandInteraction, Guild, InteractionTypes, JSONMember, Member, Message, TextableChannel } from "oceanic.js";
 import { commands } from "./commands";
 
 const client = new Client({
     auth: "Bot " + GetConvar("discord_token", ""),
     gateway: {
-        intents: ["GUILD_MESSAGES", "MESSAGE_CONTENT"]
+        intents: ["GUILD_MESSAGES", "MESSAGE_CONTENT", "GUILD_MEMBERS"]
     }
 });
 
+const roles: Map<string, string> = new Map<string, string>(Object.entries(JSON.parse(GetConvar("discord_roles", "{}"))));
 const consoleChannels: string[] = JSON.parse(GetConvar("discord_consolechannels", `["resources", "svadhesive", "citizen-server-impl", "c-scripting-core", "script:citric"]`));
 const consoleShowAssets = GetConvarInt("discord_consoleassets", 0) != 0;
 
@@ -133,6 +134,32 @@ client.on("messageCreate", async (message: Message) => {
     });
 
     console.log(`${message.author.username}: ${message.content}`);
+});
+
+client.on("guildMemberUpdate", async (member: Member, oldMember: null | JSONMember) => {
+    setImmediate(() => {
+        const player = getPlayerByDiscordIdentifier(member.id);
+
+        if (typeof player == "undefined") {
+            return;
+        }
+
+        for (const role of member.roles) {
+            const principal = roles.get(role);
+
+            if (typeof principal == "undefined") {
+                continue;
+            }
+
+            // remove principals just in case
+            ExecuteCommand(`remove_principal identifier.discord:${member.id} ${principal}`);
+
+            if (IsPlayerAceAllowed(player, principal)) {
+                ExecuteCommand(`add_principal identifier.discord:${member.id} ${principal}`);
+                console.log(`Added principal ${principal} to player ${player}`);
+            }
+        }
+    });
 });
 
 async function init() {
