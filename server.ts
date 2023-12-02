@@ -185,7 +185,7 @@ async function handleConsoleMessage(channel: string, message: string) {
     }
 
     if (consoleChannels.indexOf(channel) != -1 || (channel.endsWith(":stream") && consoleShowAssets) ) {
-        await chatChannel.createMessage({
+        await consoleChannel.createMessage({
             content: `${channel}: ${message}`,
         });
     }
