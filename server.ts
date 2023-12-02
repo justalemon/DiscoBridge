@@ -12,6 +12,7 @@ const roles: Map<string, string> = new Map<string, string>(Object.entries(JSON.p
 const consoleChannels: string[] = JSON.parse(GetConvar("discord_consolechannels", `["resources", "svadhesive", "citizen-server-impl", "c-scripting-core", "script:citric"]`));
 const consoleShowAssets = GetConvarInt("discord_consoleassets", 0) != 0;
 
+let canChangePrincipals = true;
 let guild: Guild = undefined;
 let chatChannel: TextableChannel = undefined;
 let consoleChannel: TextableChannel = undefined;
@@ -192,6 +193,17 @@ async function handleConsoleMessage(channel: string, message: string) {
 }
 
 async function init() {
+    const principal = `resource.${GetCurrentResourceName()}`;
+
+    if (!IsPrincipalAceAllowed(principal, "command.add_principal")) {
+        canChangePrincipals = false;
+        console.log(`Unable to use add_principal, please run "add_ace ${principal} command.add_principal allow" to allow the resource to change permissions`);
+    }
+    if (!IsPrincipalAceAllowed(principal, "command.remove_principal")) {
+        canChangePrincipals = false;
+        console.log(`Unable to use remove_principal, please run "add_ace ${principal} command.remove_principal allow" to allow the resource to change permissions`);
+    }
+
     onNet("chatMessage", handleChatMessage);
 
     RegisterConsoleListener(handleConsoleMessage);
