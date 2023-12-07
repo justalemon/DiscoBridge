@@ -14,6 +14,7 @@ const client = new Client({
 const roles: Map<string, string> = new Map<string, string>(Object.entries(JSON.parse(GetConvar("discord_roles", "{}"))));
 const consoleChannels: string[] = JSON.parse(GetConvar("discord_consolechannels", `["resources", "svadhesive", "citizen-server-impl", "c-scripting-core", "script:citric"]`));
 const consoleShowAssets = GetConvarInt("discord_consoleassets", 0) != 0;
+const whitelist = GetConvarInt("discord_whitelist", 0) != 0;
 
 let canChangePrincipals = true;
 let guild: Guild = undefined;
@@ -196,6 +197,37 @@ async function handleChatMessage(source: number, author: string, message: string
     });
 }
 
+async function handleJoinWhitelist(playerName: string, setKickReason: (reason: string) => void, deferrals: Deferrals) {
+    const player = source;
+
+    if (!whitelist) {
+        return;
+    }
+
+    deferrals.defer();
+    deferrals.update("Fetching your Discord ID...");
+
+    await Delay(1);
+
+    const discord = GetPlayerIdentifierByType(player.toString(), "discord");
+
+    if (discord == null) {
+        deferrals.done("Your Discord ID is not available. Please open the Discord app and restart the game.");
+        return;
+    }
+    
+    deferrals.update("Fetching your Discord details...");
+
+    const member = await guild.getMember(discord.replace("discord:", ""));
+
+    if (member == null) {
+        deferrals.done("Please join our Discord server so you can play online.");
+        return;
+    }
+
+    deferrals.done();
+}
+
 async function handleConsoleMessage(channel: string, message: string) {
     // invalidate the messages from our own resource to avoid "RangeError: Maximum call stack size exceeded"
     if (typeof consoleChannel == "undefined" || channel == "script:discordbridge" || channel.length == 0 || message.length == 0) {
@@ -222,6 +254,7 @@ async function init() {
     }
 
     onNet("chatMessage", handleChatMessage);
+    on("playerConnecting", handleJoinWhitelist);
 
     RegisterConsoleListener(handleConsoleMessage);
 
