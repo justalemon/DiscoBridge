@@ -20,6 +20,14 @@ let guild: Guild = undefined;
 let chatChannel: TextableChannel = undefined;
 let consoleChannel: TextableChannel = undefined;
 
+type DeferralsCallback = (data: object, rawData: string) => void;
+type Deferrals = {
+    defer(): void,
+    update(message: string): void,
+    presentCard(card: object | string, cb?: DeferralsCallback): void,
+    done(failureReason?: string): void,
+}
+
 function getPlayerByDiscordIdentifier(id: string) {
     for (let i = 0; i < GetNumPlayerIndices(); i++) {
         const player = GetPlayerFromIndex(i);
