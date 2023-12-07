@@ -1,6 +1,7 @@
 import { ActivityTypes, ApplicationCommandTypes, ChannelTypes, Client, CommandInteraction, Guild, InteractionTypes, JSONMember, Member, Message, TextableChannel } from "oceanic.js";
 import { commands } from "./commands";
 
+const Delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 const reColor = new RegExp("\^[0-9]", "g");
 
 const client = new Client({
