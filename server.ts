@@ -15,6 +15,7 @@ const roles: Map<string, string> = new Map<string, string>(Object.entries(JSON.p
 const consoleChannels: string[] = JSON.parse(GetConvar("discord_consolechannels", `["resources", "svadhesive", "citizen-server-impl", "c-scripting-core", "script:citric"]`));
 const consoleShowAssets = GetConvarInt("discord_consoleassets", 0) != 0;
 const whitelist = GetConvarInt("discord_whitelist", 0) != 0;
+const sendReady = GetConvarInt("discord_sendready", 1) != 0;
 
 let canChangePrincipals = true;
 let guild: Guild = undefined;
@@ -121,12 +122,14 @@ client.on("ready", async () => {
         console.log(`Allowing ${channels} for the console channel`);
     }
 
-    chatChannel?.createMessage({
-        content: "Chat is ready!"
-    });
-    consoleChannel?.createMessage({
-        content: "Console is ready!"
-    });
+    if (sendReady) {
+        chatChannel?.createMessage({
+            content: "Chat is ready!"
+        });
+        consoleChannel?.createMessage({
+            content: "Console is ready!"
+        });
+    }
 });
 
 client.on("messageCreate", async (message: Message) => {
