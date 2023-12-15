@@ -182,6 +182,10 @@ client.on("messageCreate", async (message: Message) => {
 });
 
 client.on("guildMemberUpdate", async (member: Member, oldMember: null | JSONMember) => {
+    if (!canChangePrincipals) {
+        return;
+    }
+
     setImmediate(() => {
         const player = getPlayerByDiscordIdentifier(member.id);
 
