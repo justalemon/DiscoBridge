@@ -3,6 +3,7 @@ import { commands } from "./commands";
 
 const Delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 const reColor = new RegExp("\^[0-9]", "g");
+const reEmoji = new RegExp("<(a?):([A-Za-z0-9]+):([0-9]+)>", "g");
 
 const client = new Client({
     auth: "Bot " + GetConvar("discord_token", ""),
@@ -41,6 +42,28 @@ function getPlayerByDiscordIdentifier(id: string) {
     }
 
     return undefined;
+}
+
+function formatMessageWithEmojis(message: string, namesOnly: boolean) {
+    const matches = message.matchAll(reEmoji);
+
+    for (const match of matches) {
+        const raw = match[0];
+        const isAnimated = match[1] == "a";
+        const name = match[2];
+        const id = match[3];
+
+        if (namesOnly) {
+            message = message.replace(raw, `:${name}:`);
+        } else {
+            const ext = isAnimated ? "gif" : "png";
+            const url = `https://cdn.discordapp.com/emojis/${id}.${ext}`;
+            const html = `<img class="discordbridge-emoji discord-emoji emoji" src="${url}" />`
+            message = message.replace(raw, html);
+        }
+    }
+
+    return message;
 }
 
 async function getChannelFromConvar(convar: string, purpose: string) {
@@ -152,10 +175,10 @@ client.on("messageCreate", async (message: Message) => {
 
     TriggerClientEvent("chat:addMessage", -1, {
         color: color,
-        args: [message.author.username, message.content]
+        args: [message.author.username, formatMessageWithEmojis(message.content, false)]
     });
 
-    console.log(`${message.author.username}: ${message.content}`);
+    console.log(`${message.author.username}: ${formatMessageWithEmojis(message.content, true)}`);
 });
 
 client.on("guildMemberUpdate", async (member: Member, oldMember: null | JSONMember) => {
