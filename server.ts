@@ -156,7 +156,7 @@ client.on("ready", async () => {
 });
 
 client.on("messageCreate", async (message: Message) => {
-    if (typeof chatChannel == "undefined" || message.author.bot) {
+    if (typeof chatChannel == "undefined" || message.author.bot || message.channelID != chatChannel.id) {
         return;
     }
 
