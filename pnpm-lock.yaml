@@ -795,7 +795,7 @@ packages:
     engines: {node: '>=16.16.0'}
     dependencies:
       tslib: 2.6.2
-      undici: 5.27.2
+      undici: 5.28.4
       ws: 8.14.2
     optionalDependencies:
       '@discordjs/voice': 0.16.0
@@ -1111,8 +1111,8 @@ packages:
     hasBin: true
     dev: false
 
-  /undici@5.27.2:
-    resolution: {integrity: sha512-iS857PdOEy/y3wlM3yRp+6SNQQ6xU0mmZcwRSriqk+et/cwWAtwmIGf6WkoDN2EK/AMdCO/dfXzIwi+rFMrjjQ==}
+  /undici@5.28.4:
+    resolution: {integrity: sha512-72RFADWFqKmUb2hmmvNODKL3p9hcB6Gt2DOQMis1SEBaV6a4MH8soBvzg+95CYhCKPFedut2JY9bMfrDl9D23g==}
     engines: {node: '>=14.0'}
     dependencies:
       '@fastify/busboy': 2.0.0
