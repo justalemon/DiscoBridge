@@ -49,7 +49,7 @@ packages:
       discord-api-types: 0.37.62
       prism-media: 1.3.5
       tslib: 2.6.2
-      ws: 8.14.2
+      ws: 8.17.1
     transitivePeerDependencies:
       - '@discordjs/opus'
       - bufferutil
@@ -796,7 +796,7 @@ packages:
     dependencies:
       tslib: 2.6.2
       undici: 5.28.4
-      ws: 8.14.2
+      ws: 8.17.1
     optionalDependencies:
       '@discordjs/voice': 0.16.0
     transitivePeerDependencies:
@@ -1243,8 +1243,8 @@ packages:
     resolution: {integrity: sha512-CC1bOL87PIWSBhDcTrdeLo6eGT7mCFtrg0uIJtqJUFyK+eJnzl8A1niH56uu7KMa5XFrtiV+AQuHO3n7DsHnLQ==}
     dev: false
 
-  /ws@8.14.2:
-    resolution: {integrity: sha512-wEBG1ftX4jcglPxgFCMJmZ2PLtSbJ2Peg6TmpJFTbe9GZYOQCDPdMYu/Tm0/bGZkw8paZnJY45J4K2PZrLYq8g==}
+  /ws@8.17.1:
+    resolution: {integrity: sha512-6XQFvXTkbfUOZOKKILFG1PDK2NDQs4azKQl26T0YS5CxqWLgXajbPZ+h4gZekJyRqFU8pvnbAbbs/3TgRPy+GQ==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
