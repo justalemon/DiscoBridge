@@ -1,26 +1,14 @@
-import { ApplicationCommandTypes, CommandInteraction, CreateApplicationCommandOptions } from "oceanic.js";
+import { Collection, CommandInteraction, SlashCommandBuilder } from "discord.js";
 
-type Command = CreateApplicationCommandOptions & {
-    handler: (interaction: CommandInteraction) => void,
-};
+const c = new Collection<SlashCommandBuilder, (interaction: CommandInteraction) => Promise<void>>();
+c.set(new SlashCommandBuilder().setName("players").setDescription("Lists the players on the server"), execute);
 
-const commands: Map<string, Command> = new Map<string, Command>();
-
-async function commandPlayer(interaction: CommandInteraction) {
+async function execute(interaction: CommandInteraction) {
     setImmediate(async () => {
         const count = GetNumPlayerIndices();
         const total = GetConvarInt("sv_maxclients", -1);
     
-        await interaction.createMessage({
-            content: `There are ${count} players connected (max ${total})`,
-        });
+        await interaction.reply(`There are ${count} players connected (max ${total})`);
     });
 }
-commands.set("players", {
-    type: ApplicationCommandTypes.CHAT_INPUT,
-    name: "players",
-    description: "Lists the players on the server",
-    handler: commandPlayer,
-});
-
-export { commands };
+export const commands = c;
