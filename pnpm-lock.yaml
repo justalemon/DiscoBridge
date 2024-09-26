@@ -21,8 +21,8 @@ importers:
         specifier: ^11.0.0
         version: 11.0.0(webpack@5.94.0(webpack-cli@5.1.4))
       oceanic.js:
-        specifier: ^1.10.4
-        version: 1.10.4
+        specifier: ^1.8.1
+        version: 1.8.1
       ts-loader:
         specifier: ^9.5.0
         version: 9.5.0(typescript@5.2.2)(webpack@5.94.0(webpack-cli@5.1.4))
@@ -48,6 +48,10 @@ packages:
   '@discoveryjs/json-ext@0.5.7':
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
     engines: {node: '>=10.0.0'}
+
+  '@fastify/busboy@2.1.1':
+    resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
+    engines: {node: '>=14'}
 
   '@jridgewell/gen-mapping@0.3.3':
     resolution: {integrity: sha512-HLhSWOLRi875zjjMG/r+Nv0oCW8umGb0BgEhyX3dDX3egwZtB8PqLnjz3yedt8R5StBrzcg4aBpnh8UA9D1BoQ==}
@@ -467,9 +471,9 @@ packages:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
     engines: {node: '>=0.10.0'}
 
-  oceanic.js@1.10.4:
-    resolution: {integrity: sha512-pgTc4xYUBgXvyxHit7NuwON7yYpKaO2F/4xego08TNGPCwzU1hE+NQGTKw6A8+AYOoF6R3V6oJSuGAq2pXdsKA==}
-    engines: {node: '>=18.13.0'}
+  oceanic.js@1.8.1:
+    resolution: {integrity: sha512-RLmQMj4spWycN+/8VSVF/y1DVpLDNSZoCCt4Jqdfe5C4HpI9eTeyQ0CuQmPHrfyU80Oz1b5joqwy9JZvFAZN3Q==}
+    engines: {node: '>=16.16.0'}
 
   p-limit@2.3.0:
     resolution: {integrity: sha512-//88mFWSJx8lxCzwdAABTJL2MyWB12+eIY7MDL2SqLmAkeKU9qxRvWuSyTjm3FUmpBEMuFfckAIqEaVGUDxb6w==}
@@ -665,6 +669,10 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  undici@5.28.4:
+    resolution: {integrity: sha512-72RFADWFqKmUb2hmmvNODKL3p9hcB6Gt2DOQMis1SEBaV6a4MH8soBvzg+95CYhCKPFedut2JY9bMfrDl9D23g==}
+    engines: {node: '>=14.0'}
+
   update-browserslist-db@1.0.13:
     resolution: {integrity: sha512-xebP81SNcPuNpPP3uzeW1NYXxI3rxyJzF3pD6sH4jE7o/IX+WtSpwnVU+qIsDPyk0d3hmFQ7mjqc6AtV604hbg==}
     hasBin: true
@@ -759,6 +767,8 @@ snapshots:
     optional: true
 
   '@discoveryjs/json-ext@0.5.7': {}
+
+  '@fastify/busboy@2.1.1': {}
 
   '@jridgewell/gen-mapping@0.3.3':
     dependencies:
@@ -1164,9 +1174,10 @@ snapshots:
 
   normalize-path@3.0.0: {}
 
-  oceanic.js@1.10.4:
+  oceanic.js@1.8.1:
     dependencies:
       tslib: 2.6.2
+      undici: 5.28.4
       ws: 8.17.1
     optionalDependencies:
       '@discordjs/voice': 0.16.1
@@ -1328,6 +1339,10 @@ snapshots:
   tslib@2.6.2: {}
 
   typescript@5.2.2: {}
+
+  undici@5.28.4:
+    dependencies:
+      '@fastify/busboy': 2.1.1
 
   update-browserslist-db@1.0.13(browserslist@4.22.1):
     dependencies:
