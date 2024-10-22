@@ -36,6 +36,29 @@ export class Discord {
         this.#ws.on("open", this.#handleOpen);
     }
 
+    #identify() {
+        if (this.#ws == null || this.#ws.readyState !== WebSocket.OPEN) {
+            console.error("Unable to log in, websocket is closed");
+            return;
+        }
+
+        const data = {
+            op: 2,
+            d: {
+                token: this.#token,
+                properties: {
+                    os: process.platform,
+                    browser: `DiscoSync for fxserver`,
+                    device: `DiscoSync for fxserver`
+                },
+                intents: 3
+            }
+        }
+
+        this.#ws.send(JSON.stringify(data));
+        console.log("Sending identification payload");
+    }
+
     #performHeartbeat() {
         console.log("Performing heartbeat");
         this.#ws?.send(JSON.stringify({
@@ -59,6 +82,7 @@ export class Discord {
             console.log("Received hello, heartbeat is %d", payload.d.heartbeat_interval);
             this.#heartbeat = payload.d.heartbeat_interval;
             this.#startHeartbeat();
+            this.#identify();
         }
     }
 
