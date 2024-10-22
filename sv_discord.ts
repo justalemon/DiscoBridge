@@ -106,10 +106,14 @@ export class Discord {
         this.#interval = setInterval(this.#performHeartbeat.bind(this), this.#heartbeat + 1);
     }
 
-    #handleDispatch(type: string | null, payload: GatewayData) {
+    #handleDispatch(type: string | null, payload: GatewayData | DiscordGuild) {
         if (type == "READY") {
             console.log("Bot is ready!");
             this.#ready = true;
+        } else if (type == "GUILD_CREATE") {
+            const guild = payload as DiscordGuild;
+            this.#addGuildToCache(guild);
+            return;
         } else {
             console.log("Unknown payload type: %s", type);
             console.log(payload);
@@ -144,6 +148,18 @@ export class Discord {
         if (!this.#ready) {
             throw new Error("The bot is not ready to perform operations.");
         }
+    }
+
+    #addGuildToCache(guild: DiscordGuild) {
+        const current = this.#guilds.filter(x => x.id == guild.id)[0];
+
+        if (typeof(current) !== "undefined") {
+            const index = this.#guilds.indexOf(current);
+            this.#guilds.splice(index, 1);
+        }
+
+        this.#guilds.push(guild);
+        console.log("Added guild %s", guild.name);
     }
 
     getMember(guild: string, member: string) {
