@@ -10,7 +10,8 @@
         "types": [
             "@citizenfx/client",
             "@citizenfx/server",
-            "@types/node"
+            "@types/node",
+            "@types/ws"
         ],
         "skipLibCheck": true,
         "strictNullChecks": true
