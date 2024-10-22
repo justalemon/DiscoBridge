@@ -16,7 +16,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: [".ts"],
+    extensions: [".ts", ".js"],
   },
   output: {
     filename: "[name].js",
