@@ -15,8 +15,8 @@ interface GatewayResponse {
     d: GatewayDataHello;
 }
 
-class DiscordWebSocket {
-    #ws: WebSocket;
+export class Discord {
+    #ws: WebSocket | null = null;
     #token: string;
 
     constructor(token: string) {
@@ -40,20 +40,10 @@ class DiscordWebSocket {
         
         if (payload.op == 10) {
             console.log("Received hello, heartbeat is %d", payload.d.heartbeat_interval);
-
-
         }
     }
 
     #handleOpen() {
         console.log("Discord Websocket Connection is Open");
-    }
-}
-
-export class Discord {
-    #ws: DiscordWebSocket;
-
-    constructor(token: string) {
-        this.#ws = new DiscordWebSocket(token);
     }
 }
