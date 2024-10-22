@@ -17,13 +17,19 @@ interface GatewayResponse {
 
 class DiscordWebSocket {
     #ws: WebSocket;
+    #token: string;
 
-    constructor() {
+    constructor(token: string) {
+        this.#token = token;
         this.#connect();
     }
 
     #connect() {
-        this.#ws = new WebSocket("wss://gateway.discord.gg/?v=10&encoding=json");
+        this.#ws = new WebSocket("wss://gateway.discord.gg/?v=10&encoding=json", {
+            headers: {
+                "authorization": `Bearer ${this.#token}`
+            }
+        });
         this.#ws.on("message", this.#handleMessage);
         this.#ws.on("open", this.#handleOpen);
     }
@@ -45,5 +51,9 @@ class DiscordWebSocket {
 }
 
 export class Discord {
-    #ws = new DiscordWebSocket();
+    #ws: DiscordWebSocket;
+
+    constructor(token: string) {
+        this.#ws = new DiscordWebSocket(token);
+    }
 }
