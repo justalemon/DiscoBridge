@@ -1,4 +1,6 @@
 import WebSocket, { Data } from "ws";
+import { DiscordGuild } from "./discord/types/guild";
+import { DiscordUser } from "./discord/types/user";
 
 interface DiscordGuildBasic {
     unavailable: boolean,
@@ -48,6 +50,8 @@ export class Discord {
     #interval: NodeJS.Timeout | null = null;
     #heartbeat: number = -1;
     #ready: boolean = false;
+
+    #guilds: DiscordGuild[] = [];
 
     constructor(token: string) {
         this.#token = token;
@@ -108,6 +112,7 @@ export class Discord {
             this.#ready = true;
         } else {
             console.log("Unknown payload type: %s", type);
+            console.log(payload);
         }
     }
 
@@ -133,5 +138,17 @@ export class Discord {
 
     #handleOpen() {
         console.log("Discord Websocket Connection is Open");
+    }
+
+    #ensureReady() {
+        if (!this.#ready) {
+            throw new Error("The bot is not ready to perform operations.");
+        }
+    }
+
+    getMember(guild: string, member: string) {
+        this.#ensureReady();
+
+
     }
 }
