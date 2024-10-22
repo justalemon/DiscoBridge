@@ -32,11 +32,28 @@ interface GatewayDataHello extends GatewayData {
     heartbeat_interval: number;
 }
 
+interface GatewayDataReady extends GatewayData {
+    v: 10 | 9 | 8 | 7 | 6;
+    user_settings: any,
+    user: DiscordUser,
+    session_type: "normal",
+    session_id: string,
+    resume_gateway_url: string,
+    relationships: any[],
+    private_channels: any[],
+    presences: any[],
+    guilds: DiscordGuildBasic,
+    guild_join_requests: any,
+    geo_ordered_rtc_regions: string[],
+    auth: any,
+    application: DiscordApplicationBasic
+}
+
 interface GatewayResponse {
     t: string | null;
     s: number | null;
     op: number;
-    d: GatewayDataHello;
+    d: GatewayDataHello | GatewayDataReady;
 }
 
 export class Discord {
@@ -44,6 +61,7 @@ export class Discord {
     #token: string;
     #interval: NodeJS.Timeout | null = null;
     #heartbeat: number = -1;
+    #ready: boolean = false;
 
     constructor(token: string) {
         this.#token = token;
@@ -98,15 +116,32 @@ export class Discord {
         this.#interval = setInterval(this.#performHeartbeat.bind(this), this.#heartbeat + 1);
     }
 
+    #handleDispatch(type: string | null, payload: GatewayData) {
+        if (type == "READY") {
+            console.log("Bot is ready!");
+            this.#ready = true;
+        } else {
+            console.log("Unknown payload type: %s", type);
+        }
+    }
+
     #handleMessage(data: Data) {
         const asString = data.toString();
         const payload: GatewayResponse = JSON.parse(asString);
-        
-        if (payload.op == 10) {
-            console.log("Received hello, heartbeat is %d", payload.d.heartbeat_interval);
-            this.#heartbeat = payload.d.heartbeat_interval;
-            this.#startHeartbeat();
-            this.#identify();
+
+        switch (payload.op) {
+            // dispatch
+            case 0:
+                this.#handleDispatch(payload.t, payload.d);
+                break;
+            // Hello
+            case 10:
+                const data = payload.d as GatewayDataHello;
+                console.log("Received hello, heartbeat is %d", data.heartbeat_interval);
+                this.#heartbeat = data.heartbeat_interval;
+                this.#startHeartbeat();
+                this.#identify();
+                break;
         }
     }
 
