@@ -18,11 +18,11 @@ interface GatewayResponse {
 export class Discord {
     #ws: WebSocket | null = null;
     #token: string;
-    #heartbeatInterval: number = -1;
+    #interval: NodeJS.Timeout | null = null;
+    #heartbeat: number = -1;
 
     constructor(token: string) {
         this.#token = token;
-        this.#heartbeatInterval = -1;
         this.#connect();
     }
 
@@ -43,14 +43,22 @@ export class Discord {
         }));
     }
 
+    #startHeartbeat() {
+        if (this.#interval !== null) {
+            clearInterval(this.#interval);
+        }
+
+        this.#interval = setInterval(this.#performHeartbeat.bind(this), this.#heartbeat + 1);
+    }
+
     #handleMessage(data: Data) {
         const asString = data.toString();
         const payload: GatewayResponse = JSON.parse(asString);
         
         if (payload.op == 10) {
             console.log("Received hello, heartbeat is %d", payload.d.heartbeat_interval);
-            this.#heartbeatInterval = payload.d.heartbeat_interval;
-            setInterval(this.#performHeartbeat.bind(this), this.#heartbeatInterval + 1);
+            this.#heartbeat = payload.d.heartbeat_interval;
+            this.#startHeartbeat();
         }
     }
 
