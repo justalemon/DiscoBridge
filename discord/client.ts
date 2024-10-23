@@ -23,6 +23,10 @@ export class Discord {
         this.#connect();
     }
 
+    get isReady() : boolean {
+        return this.#ready;
+    }
+
     #connect() {
         this.#ws = new WebSocket("wss://gateway.discord.gg/?v=10&encoding=json", {
             headers: {
