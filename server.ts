@@ -1,5 +1,6 @@
 import { Discord } from "./discord/client";
 
+const Delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 let discord: Discord | null = null;
 
 function init() {
