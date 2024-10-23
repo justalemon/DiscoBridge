@@ -1,23 +1,22 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
-export async function request<T>(method: "GET" | "POST" | "PUT" | "DELETE", token: string, endpoint: string) {
-    const resp = await axios.request<T>({
-        baseURL: `https://discord.com/api/v10`,
-        url: endpoint,
-        method: method,
-        headers: {
-            "User-Agent": "DiscoBridge for fxserver (https://github.com/justalemon/DiscoBridge)",
-            "Authorization": `Bot ${token}`
-        }
-    });
-
-    if (resp.status == 404) {
-        return null;
-    }
-
-    if (resp.status < 400) {
+export async function request<T>(method: "GET" | "POST" | "PUT" | "DELETE", token: string, endpoint: string, data?: any) {
+    try {
+        const resp = await axios.request<T>({
+            baseURL: `https://discord.com/api/v10`,
+            url: endpoint,
+            method: method,
+            headers: {
+                "User-Agent": "DiscoBridge for fxserver (https://github.com/justalemon/DiscoBridge)",
+                "Authorization": `Bot ${token}`
+            },
+            data: data == null ? null : JSON.stringify(data)
+        });
         return resp.data;
+    } catch (e) {
+        if (e instanceof AxiosError) {
+            console.error(e.response?.data);
+        }
+        throw e;
     }
-
-    throw new Error(`HTTP Returned non 200 code: ${resp.status}`);
 }
