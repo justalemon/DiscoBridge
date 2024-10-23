@@ -1,31 +1,44 @@
 import { Discord } from "./discord/client";
-import { DiscordChannelType } from "./discord/types/channel";
+import { DiscordChannel, DiscordChannelType } from "./discord/types/channel";
 import { Deferrals, SetKickReason } from "./fxserver/types";
 
 const Delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 const reColor = new RegExp("\^[0-9]", "g");
-let discord: Discord | null = null;
-
 const whitelist = GetConvarInt("discord_whitelist", 0) != 0;
 
-async function handleChatMessage(source: number, author: string, message: string) {
-    if (discord == null) {
-        return;
+let discord: Discord | null = null;
+let chatChannel: DiscordChannel | null = null;
+
+async function getChannelFromConvar(convar: string, purpose: string) {
+    const channelId = GetConvarInt(convar, 0);
+    const guildId = GetConvarInt("discord_guild", 0);
+
+    if (discord === null || channelId === 0 || guildId === 0) {
+        return null;
     }
 
-    const guild = await discord.getGuild(GetConvar("discord_guild", ""));
+    const guild = await discord.getGuild(guildId.toString());
 
     if (guild === null) {
+        return null;
+    }
+
+    const channel = await discord.getChannel(guild.id, channelId.toString());
+
+    if (channel === null || channel.type !== DiscordChannelType.GuildText) {
+        return null;
+    }
+
+    console.log(`Using channel ${channel.name} (${channel.id}) as the ${purpose} channel`);
+    return channel;
+}
+
+async function handleChatMessage(source: number, author: string, message: string) {
+    if (discord == null || chatChannel === null) {
         return;
     }
 
-    const channel = await discord.getChannel(guild.id, GetConvar("discord_chat", "0"));
-
-    if (channel === null || channel.type !== DiscordChannelType.GuildText){
-        return;
-    }
-
-    await discord.sendMessage(channel.id, `${author}: ` + message.replaceAll(reColor, ""));
+    await discord.sendMessage(chatChannel.id, `${author}: ` + message.replaceAll(reColor, ""));
 }
 
 async function handleJoinWhitelist(playerName: string, setKickReason: SetKickReason, deferrals: Deferrals) {
@@ -66,7 +79,7 @@ async function handleJoinWhitelist(playerName: string, setKickReason: SetKickRea
     deferrals.done();
 }
 
-function init() {
+async function init() {
     const token = GetConvar("discord_token", "");
 
     if (token === null) {
@@ -85,6 +98,12 @@ function init() {
     }
 
     discord = new Discord(token);
+
+    while (!discord.isReady) {
+        await Delay(0);
+    }
+
+    chatChannel = await getChannelFromConvar("discord_chat", "chat");
 
     on("playerConnecting", handleJoinWhitelist);
     onNet("chatMessage", handleChatMessage);
