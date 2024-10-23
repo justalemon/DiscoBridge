@@ -103,7 +103,7 @@ export class Discord {
             clearInterval(this.#interval);
         }
 
-        this.#interval = setInterval(this.#performHeartbeat.bind(this), this.#heartbeat + 1);
+        this.#interval = setInterval(this.#performHeartbeat.bind(this), this.#heartbeat);
     }
 
     #handleDispatch(type: string | null, payload: GatewayData | DiscordGuild) {
