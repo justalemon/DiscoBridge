@@ -1,6 +1,8 @@
 import WebSocket, { Data } from "ws";
+import { request } from "./discord/rest";
 import { DiscordGuild } from "./discord/types/guild";
 import { DiscordUser } from "./discord/types/user";
+import { DiscordGuildMember } from "./discord/types/guild_member";
 
 interface DiscordGuildBasic {
     unavailable: boolean,
@@ -166,9 +168,28 @@ export class Discord {
         console.log("Added guild %s", guild.name);
     }
 
-    getMember(guild: string, member: string) {
+    async getMember(guildId: string, memberId: string) {
         this.#ensureReady();
 
+        const guild = this.#guilds.find(x => x.id == guildId);
 
+        if (typeof(guild) === "undefined") {
+            return null;
+        }
+
+        const foundMember = guild.members.find(x => x.user.id == memberId);
+
+        if (typeof(foundMember) !== "undefined") {
+            return foundMember;
+        }
+
+        const member = await request<DiscordGuildMember>("GET", this.#token, `/guilds/${guildId}/members/${memberId}`);
+
+        if (member === null) {
+            return null;
+        }
+
+        guild.members.push(member);
+        return member;
     }
 }
