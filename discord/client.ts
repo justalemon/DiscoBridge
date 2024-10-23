@@ -144,7 +144,7 @@ export class Discord {
         }
 
         this.#guilds.push(fetchedGuild);
-        return guildId;
+        return fetchedGuild;
     }
 
     async getMember(guildId: string, memberId: string) {
