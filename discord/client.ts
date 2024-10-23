@@ -7,6 +7,7 @@ import { GatewayData } from "./gateway/data";
 import { GatewayHello } from "./gateway/hello";
 import { GatewayResponse } from "./gateway/response";
 import { DiscordChannel } from "./types/channel";
+import { debug } from "../tools";
 
 export class Discord {
     #ws: WebSocket | null = null;
@@ -52,11 +53,11 @@ export class Discord {
         }
 
         this.#ws.send(JSON.stringify(data));
-        console.log("Sending identification payload");
+        debug("Sending identification payload");
     }
 
     #performHeartbeat() {
-        console.log("Performing heartbeat");
+        debug("Performing heartbeat");
         this.#ws?.send(JSON.stringify({
             "op": 1,
             "d": null
@@ -80,8 +81,8 @@ export class Discord {
             this.#addGuildToCache(guild);
             return;
         } else {
-            console.log("Unknown payload type: %s", type);
-            console.log(payload);
+            debug("Unknown payload type: %s", type);
+            debug(payload);
         }
     }
 
@@ -109,7 +110,7 @@ export class Discord {
     }
 
     #handleOpen() {
-        console.log("Discord Websocket Connection is Open");
+        debug("Discord Websocket Connection is Open");
     }
 
     #ensureReady() {
