@@ -1,50 +1,10 @@
 import WebSocket, { Data } from "ws";
 import { request } from "./discord/rest";
 import { DiscordGuild } from "./discord/types/guild";
-import { DiscordUser } from "./discord/types/user";
 import { DiscordGuildMember } from "./discord/types/guild_member";
-
-interface DiscordGuildBasic {
-    unavailable: boolean,
-    id: string
-}
-
-interface DiscordApplicationBasic {
-    id: string,
-    flags: number
-}
-
-interface GatewayData {
-    _trace: string[]
-}
-
-interface GatewayDataHello extends GatewayData {
-    heartbeat_interval: number;
-}
-
-interface GatewayDataReady extends GatewayData {
-    v: 10 | 9 | 8 | 7 | 6;
-    user_settings: any,
-    user: DiscordUser,
-    session_type: "normal",
-    session_id: string,
-    resume_gateway_url: string,
-    relationships: any[],
-    private_channels: any[],
-    presences: any[],
-    guilds: DiscordGuildBasic,
-    guild_join_requests: any,
-    geo_ordered_rtc_regions: string[],
-    auth: any,
-    application: DiscordApplicationBasic
-}
-
-interface GatewayResponse {
-    t: string | null;
-    s: number | null;
-    op: number;
-    d: GatewayDataHello | GatewayDataReady;
-}
+import { GatewayData } from "./discord/gateway/data";
+import { GatewayHello } from "./discord/gateway/hello";
+import { GatewayResponse } from "./discord/gateway/response";
 
 export class Discord {
     #ws: WebSocket | null = null;
@@ -134,7 +94,7 @@ export class Discord {
                 break;
             // Hello
             case 10:
-                const data = payload.d as GatewayDataHello;
+                const data = payload.d as GatewayHello;
                 console.log("Received hello, heartbeat is %d", data.heartbeat_interval);
                 this.#heartbeat = data.heartbeat_interval;
                 this.#startHeartbeat();
