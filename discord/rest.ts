@@ -1,6 +1,9 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import { debug } from "../tools";
 
 export async function request<T>(method: "GET" | "POST" | "PUT" | "DELETE", token: string, endpoint: string, data?: any) {
+    debug(method, endpoint, data ?? "");
+
     try {
         const options: AxiosRequestConfig = {
             baseURL: `https://discord.com/api/v10`,
