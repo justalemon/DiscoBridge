@@ -94,7 +94,8 @@ export class Discord {
     #performHeartbeat() {
         console.log("Performing heartbeat");
         this.#ws?.send(JSON.stringify({
-            "op": 1
+            "op": 1,
+            "d": null
         }));
     }
 
