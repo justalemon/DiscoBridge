@@ -53,6 +53,15 @@ function init() {
         return;
     }
 
+    const principal = `resource.${GetCurrentResourceName()}`;
+
+    if (!IsPrincipalAceAllowed(principal, "command.add_principal")) {
+        console.log(`Unable to use add_principal, please run "add_ace ${principal} command.add_principal allow" to allow the resource to change permissions`);
+    }
+    if (!IsPrincipalAceAllowed(principal, "command.remove_principal")) {
+        console.log(`Unable to use remove_principal, please run "add_ace ${principal} command.remove_principal allow" to allow the resource to change permissions`);
+    }
+
     discord = new Discord(token);
 
     on("playerConnecting", handleJoinWhitelist);
