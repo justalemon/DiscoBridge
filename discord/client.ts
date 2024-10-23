@@ -5,6 +5,7 @@ import { DiscordGuildMember } from "./types/guild_member";
 import { GatewayData } from "./gateway/data";
 import { GatewayHello } from "./gateway/hello";
 import { GatewayResponse } from "./gateway/response";
+import { DiscordChannel } from "./types/channel";
 
 export class Discord {
     #ws: WebSocket | null = null;
@@ -145,6 +146,36 @@ export class Discord {
 
         this.#guilds.push(fetchedGuild);
         return fetchedGuild;
+    }
+
+    async getChannel(guildId: string, channelId: string) {
+        const guild = await this.getGuild(guildId);
+
+        if (guild === null) {
+            return null;
+        }
+
+        const foundChannel = guild.channels.find(x => x.id == channelId) ?? null;
+
+        // sometimes we might get missing guild ids
+        // because we are looking for a channel in a guild, make the it required
+        if (foundChannel !== null && typeof(foundChannel.guild_id) !== "undefined") {
+            return foundChannel;
+        }
+
+        if (foundChannel !== null) {
+            const index = guild.channels.indexOf(foundChannel);
+            guild.channels.splice(index, 1);
+        }
+
+        const channel = await request<DiscordChannel>("GET", this.#token, `/channels/${channelId}`);
+
+        if (channel === null || channel.guild_id !== guildId) {
+            return null;
+        }
+
+        guild.channels.push(channel);
+        return channel;
     }
 
     async getMember(guildId: string, memberId: string) {
