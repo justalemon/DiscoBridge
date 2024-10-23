@@ -128,6 +128,25 @@ export class Discord {
         console.log("Added guild %s", guild.name);
     }
 
+    async getGuild(guildId: string) {
+        this.#ensureReady();
+
+        const foundGuild = this.#guilds.find(x => x.id == guildId);
+
+        if (typeof(foundGuild) !== "undefined") {
+            return foundGuild;
+        }
+
+        const fetchedGuild = await request<DiscordGuild>("GET", this.#token, `/guilds/${guildId}`);
+
+        if (fetchedGuild === null) {
+            return null; 
+        }
+
+        this.#guilds.push(fetchedGuild);
+        return guildId;
+    }
+
     async getMember(guildId: string, memberId: string) {
         this.#ensureReady();
 
