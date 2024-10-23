@@ -5,9 +5,25 @@ import { DiscordThreadMember } from "./thread_member";
 import { DiscordThreadMetadata } from "./thread_metadata";
 import { DiscordUser } from "./user";
 
+export enum DiscordChannelType {
+    GuildText = 0,
+    DM = 1,
+    GuildVoice = 2,
+    GroupDM = 3,
+    GuildCategory = 4,
+    GuildAnnouncement = 5,
+    AnnouncementThread = 10,
+    PublicThread = 11,
+    PrivateThread = 12,
+    GuildStageVoice = 13,
+    GuildDirectory = 14,
+    GuildForum = 15,
+    GuildMedia = 16
+}
+
 export interface DiscordChannel {
     id: string,
-    type: number,
+    type: DiscordChannelType,
     guild_id: string | null,
     position: number,
     permission_overwrites: DiscordPermissionOverwrite[],
