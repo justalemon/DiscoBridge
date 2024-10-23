@@ -37,3 +37,4 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}.${{ matrix.node-version }}
           path: dist
+          if-no-files-found: error
