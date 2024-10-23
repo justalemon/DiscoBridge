@@ -150,9 +150,9 @@ export class Discord {
     async getMember(guildId: string, memberId: string) {
         this.#ensureReady();
 
-        const guild = this.#guilds.find(x => x.id == guildId);
+        const guild = await this.getGuild(guildId);
 
-        if (typeof(guild) === "undefined") {
+        if (guild === null) {
             return null;
         }
 
