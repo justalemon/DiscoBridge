@@ -1,10 +1,32 @@
 import { Discord } from "./discord/client";
+import { DiscordChannelType } from "./discord/types/channel";
 import { Deferrals, SetKickReason } from "./fxserver/types";
 
 const Delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+const reColor = new RegExp("\^[0-9]", "g");
 let discord: Discord | null = null;
 
 const whitelist = GetConvarInt("discord_whitelist", 0) != 0;
+
+async function handleChatMessage(source: number, author: string, message: string) {
+    if (discord == null) {
+        return;
+    }
+
+    const guild = await discord.getGuild(GetConvar("discord_guild", ""));
+
+    if (guild === null) {
+        return;
+    }
+
+    const channel = await discord.getChannel(guild.id, GetConvar("discord_chat", "0"));
+
+    if (channel === null || channel.type !== DiscordChannelType.GuildText){
+        return;
+    }
+
+    await discord.sendMessage(channel.id, `${author}: ` + message.replaceAll(reColor, ""));
+}
 
 async function handleJoinWhitelist(playerName: string, setKickReason: SetKickReason, deferrals: Deferrals) {
     const src = source;
@@ -65,5 +87,6 @@ function init() {
     discord = new Discord(token);
 
     on("playerConnecting", handleJoinWhitelist);
+    onNet("chatMessage", handleChatMessage);
 }
 init();
