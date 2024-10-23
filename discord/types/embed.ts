@@ -43,7 +43,7 @@ export interface DiscordEmbedField {
     inline?: boolean
 }
 
-export interface Embed {
+export interface DiscordEmbed {
     title?: string,
     type?: "rich" | "image" | "video" | "gifv" | "article" | "link" | "poll_results",
     description?: string,
