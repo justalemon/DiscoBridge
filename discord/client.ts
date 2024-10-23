@@ -2,6 +2,7 @@ import WebSocket, { Data } from "ws";
 import { request } from "./rest";
 import { DiscordGuild } from "./types/guild";
 import { DiscordGuildMember } from "./types/guild_member";
+import { DiscordMessage } from "./types/message";
 import { GatewayData } from "./gateway/data";
 import { GatewayHello } from "./gateway/hello";
 import { GatewayResponse } from "./gateway/response";
@@ -201,5 +202,12 @@ export class Discord {
 
         guild.members.push(member);
         return member;
+    }
+
+    async sendMessage(channelId: string, message: string) {
+        // TODO: More options (https://discord.com/developers/docs/resources/message#create-message)
+        return await request<DiscordMessage>("POST", this.#token, `/channels/${channelId}/messages`, {
+            content: message
+        });
     }
 }
