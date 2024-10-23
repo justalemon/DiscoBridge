@@ -15,8 +15,10 @@ export async function request<T>(method: "GET" | "POST" | "PUT" | "DELETE", toke
         return resp.data;
     } catch (e) {
         if (e instanceof AxiosError) {
-            console.error(e.response?.data);
+            console.error(`Error while requesting ${endpoint}`, e.response?.data);
+        } else {
+            throw e;
         }
-        throw e;
+        return null;
     }
 }
