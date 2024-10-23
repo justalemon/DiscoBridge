@@ -138,6 +138,9 @@ export class Discord {
                 this.#startHeartbeat();
                 this.#identify();
                 break;
+            // Heartbeat ACK
+            case 11:
+                break;
         }
     }
 
