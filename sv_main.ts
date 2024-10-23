@@ -1,4 +1,4 @@
-import { Discord } from "./sv_discord";
+import { Discord } from "./discord/client";
 
 let discord: Discord | null = null;
 

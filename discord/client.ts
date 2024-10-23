@@ -1,10 +1,10 @@
 import WebSocket, { Data } from "ws";
-import { request } from "./discord/rest";
-import { DiscordGuild } from "./discord/types/guild";
-import { DiscordGuildMember } from "./discord/types/guild_member";
-import { GatewayData } from "./discord/gateway/data";
-import { GatewayHello } from "./discord/gateway/hello";
-import { GatewayResponse } from "./discord/gateway/response";
+import { request } from "./rest";
+import { DiscordGuild } from "./types/guild";
+import { DiscordGuildMember } from "./types/guild_member";
+import { GatewayData } from "./gateway/data";
+import { GatewayHello } from "./gateway/hello";
+import { GatewayResponse } from "./gateway/response";
 
 export class Discord {
     #ws: WebSocket | null = null;
