@@ -5,8 +5,8 @@ import { Deferrals, SetKickReason } from "./fxserver/types";
 
 const Delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 const reColor = new RegExp("\^[0-9]", "g");
-const consoleChannels: string[] = JSON.parse(GetConvar("discord_consolechannels", `["resources", "svadhesive", "citizen-server-impl", "c-scripting-core", "script:citric"]`));
-const consoleShowAssets = GetConvarInt("discord_consoleassets", 0) != 0;
+const consoleChannels: string[] = JSON.parse(GetConvar("discord_console_channels", `["resources", "svadhesive", "citizen-server-impl", "c-scripting-core", "script:citric"]`));
+const consoleShowAssets = GetConvarInt("discord_console_assets", 0) != 0;
 
 let discord: Discord | null = null;
 let guild: DiscordGuild | null = null;
@@ -119,23 +119,23 @@ async function init() {
         return;
     }
 
-    chatChannel = await getChannelFromConvar("discord_chat");
+    chatChannel = await getChannelFromConvar("discord_channel_chat");
     if (chatChannel === null) {
         console.warn("No channel found for Chat with ID " + GetConvar("discord_chat", "0") + ", Chat Redirection is unavailable");
     } else {
-        console.log("Using channel " + GetConvar("discord_chat", "") + " for the Chat");
+        console.log("Using channel " + GetConvar("discord_channel_chat", "") + " for the Chat");
         onNet("chatMessage", handleChatMessage);
     }
 
-    consoleChannel = await getChannelFromConvar("discord_console");
+    consoleChannel = await getChannelFromConvar("discord_channel_console");
     if (consoleChannel === null) {
         console.warn("No channel found for Console with ID " + GetConvar("discord_console", "0") + ", Console Redirection is unavailable");
     } else {
-        console.log("Using channel " + GetConvar("discord_console", "") + " for the Console");
+        console.log("Using channel " + GetConvar("discord_channel_console", "") + " for the Console");
         RegisterConsoleListener(handleConsoleMessage);
     }
 
-    if (GetConvarInt("discord_whitelist", 0) != 0) {
+    if (GetConvarInt("discord_whitelist_enabled", 0) != 0) {
         console.log("Enabling Discord Join Whitelist");
         on("playerConnecting", handleJoinWhitelist);
     }
