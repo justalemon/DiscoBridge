@@ -136,6 +136,7 @@ async function init() {
     }
 
     if (GetConvarInt("discord_whitelist", 0) != 0) {
+        console.log("Enabling Discord Join Whitelist");
         on("playerConnecting", handleJoinWhitelist);
     }
 }
