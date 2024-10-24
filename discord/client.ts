@@ -20,6 +20,7 @@ export class Discord {
     #resume_gateway_url: string | null = null;
     #last_sequence: number | null = null;
     #ready: boolean = false;
+    #terminated: boolean = false;
 
     #guilds: DiscordGuild[] = [];
 
@@ -30,6 +31,10 @@ export class Discord {
 
     get isReady() : boolean {
         return this.#ready;
+    }
+
+    get terminated() : boolean {
+        return this.#terminated;
     }
 
     #connect() {
@@ -46,6 +51,7 @@ export class Discord {
             this.#ws = new WebSocket("wss://gateway.discord.gg/?v=10&encoding=json");
         }
 
+        this.#ws.on("close", (c, r) => this.#handleClose(c, r.toString()));
         this.#ws.on("message", (d) => this.#handleMessage(d));
         this.#ws.on("open", this.#handleOpen);
 
@@ -64,7 +70,7 @@ export class Discord {
     }
 
     #close() {
-        console.warn("Closing Websocket Connection");
+        debug("Closing Websocket Connection");
 
         this.#ws?.close(1000);
         this.#ws = null;
@@ -174,6 +180,12 @@ export class Discord {
                 debug(`Received opcode ${payload.op}`);
                 break;
         }
+    }
+
+    #handleClose(code: number, reason: string) {
+        console.error(`Gateway Connection Closed: Code ${code} (${reason})`);
+        this.#close();
+        this.#terminated = true;
     }
 
     #handleOpen() {
