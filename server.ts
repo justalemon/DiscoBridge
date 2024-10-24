@@ -127,7 +127,7 @@ async function init() {
 
     chatChannel = await getChannelFromConvar("discord_channel_chat");
     if (chatChannel === null) {
-        console.warn("No channel found for Chat with ID " + GetConvar("discord_chat", "0") + ", Chat Redirection is unavailable");
+        console.warn("No channel found for Chat with ID " + GetConvar("discord_channel_chat", "0") + ", Chat Redirection is unavailable");
     } else {
         console.log("Using channel " + GetConvar("discord_channel_chat", "") + " for the Chat");
         onNet("chatMessage", handleChatMessage);
@@ -135,7 +135,7 @@ async function init() {
 
     consoleChannel = await getChannelFromConvar("discord_channel_console");
     if (consoleChannel === null) {
-        console.warn("No channel found for Console with ID " + GetConvar("discord_console", "0") + ", Console Redirection is unavailable");
+        console.warn("No channel found for Console with ID " + GetConvar("discord_channel_console", "0") + ", Console Redirection is unavailable");
     } else {
         console.log("Using channel " + GetConvar("discord_channel_console", "") + " for the Console");
         RegisterConsoleListener(handleConsoleMessage);
