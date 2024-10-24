@@ -5,6 +5,7 @@ import { DiscordGuildMember } from "./types/guild_member";
 import { DiscordMessage } from "./types/message";
 import { GatewayData } from "./gateway/data";
 import { GatewayHello } from "./gateway/hello";
+import { GatewayReady } from "./gateway/ready";
 import { GatewayResponse } from "./gateway/response";
 import { DiscordChannel } from "./types/channel";
 import { debug } from "../tools";
@@ -14,6 +15,9 @@ export class Discord {
     #token: string;
     #interval: NodeJS.Timeout | null = null;
     #heartbeat: number = -1;
+    #session_id: string | null = null;
+    #resume_gateway_url: string | null = null;
+    #last_sequence: number | null = null;
     #ready: boolean = false;
 
     #guilds: DiscordGuild[] = [];
@@ -28,13 +32,34 @@ export class Discord {
     }
 
     #connect() {
-        this.#ws = new WebSocket("wss://gateway.discord.gg/?v=10&encoding=json", {
-            headers: {
-                "authorization": `Bearer ${this.#token}`
-            }
-        });
+        if (this.#ws !== null) {
+
+        }
+
+        let reconnect = false;
+
+        if (this.#session_id !== null && this.#resume_gateway_url) {
+            reconnect = true;
+            this.#ws = new WebSocket(this.#resume_gateway_url + "/?v=10&encoding=json");
+        } else {
+            this.#ws = new WebSocket("wss://gateway.discord.gg/?v=10&encoding=json");
+        }
+
         this.#ws.on("message", (d) => this.#handleMessage(d));
         this.#ws.on("open", this.#handleOpen);
+
+        if (reconnect) {
+            this.#ws?.send(JSON.stringify({
+                "op": 6,
+                "d": {
+                    token: this.#token,
+                    session_id: this.#session_id,
+                    seq: this.#last_sequence
+                }
+            }));
+            this.#session_id = null;
+            this.#last_sequence = null;
+        }
     }
 
     #identify() {
@@ -64,7 +89,7 @@ export class Discord {
         debug("Performing heartbeat");
         this.#ws?.send(JSON.stringify({
             "op": 1,
-            "d": null
+            "d": this.#last_sequence
         }));
     }
 
@@ -76,9 +101,14 @@ export class Discord {
         this.#interval = setInterval(this.#performHeartbeat.bind(this), this.#heartbeat);
     }
 
-    #handleDispatch(type: string | null, payload: GatewayData | DiscordGuild) {
+    #handleDispatch(type: string | null, payload: GatewayData | DiscordGuild, sequence: number | null) {
+        this.#last_sequence = sequence ?? 0;
+
         if (type == "READY") {
             console.log("Bot is ready!");
+            const data = payload as GatewayReady;
+            this.#session_id = data.session_id;
+            this.#resume_gateway_url = data.resume_gateway_url;
             this.#ready = true;
         } else if (type == "GUILD_CREATE") {
             const guild = payload as DiscordGuild;
@@ -97,11 +127,15 @@ export class Discord {
         switch (payload.op) {
             // Dispatch
             case 0:
-                this.#handleDispatch(payload.t, payload.d);
+                this.#handleDispatch(payload.t, payload.d, payload.s);
                 break;
             // Heartbeat
             case 1:
                 this.#performHeartbeat();
+                break;
+            // Reconnect
+            case 7:
+                this.#connect();
                 break;
             // Hello
             case 10:
