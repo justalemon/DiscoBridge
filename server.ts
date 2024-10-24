@@ -5,7 +5,7 @@ import { Deferrals, SetKickReason } from "./fxserver/types";
 
 const Delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 const reColor = new RegExp("\^[0-9]", "g");
-const consoleChannels: string[] = JSON.parse(GetConvar("discord_console_channels", `["resources", "svadhesive", "citizen-server-impl", "c-scripting-core", "script:citric"]`));
+const consoleChannels: string[] = JSON.parse(GetConvar("discord_console_channels", `[]`));
 const consoleShowAssets = GetConvarInt("discord_console_assets", 0) != 0;
 
 let discord: Discord | null = null;
