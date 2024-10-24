@@ -6,10 +6,13 @@ import { Deferrals, SetKickReason } from "./fxserver/types";
 const Delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 const reColor = new RegExp("\^[0-9]", "g");
 const whitelist = GetConvarInt("discord_whitelist", 0) != 0;
+const consoleChannels: string[] = JSON.parse(GetConvar("discord_consolechannels", `["resources", "svadhesive", "citizen-server-impl", "c-scripting-core", "script:citric"]`));
+const consoleShowAssets = GetConvarInt("discord_consoleassets", 0) != 0;
 
 let discord: Discord | null = null;
 let guild: DiscordGuild | null = null;
 let chatChannel: DiscordChannel | null = null;
+let consoleChannel: DiscordChannel | null = null;
 
 async function getChannelFromConvar(convar: string, purpose: string) {
     const channelId = GetConvarInt(convar, 0);
@@ -76,6 +79,17 @@ async function handleJoinWhitelist(playerName: string, _: SetKickReason, deferra
     deferrals.done();
 }
 
+async function handleConsoleMessage(channel: string, message: string) {
+    // invalidate the messages from our own resource to avoid "RangeError: Maximum call stack size exceeded"
+    if (discord === null || consoleChannel === null || channel == "script:discordbridge" || channel.length == 0 || message.length == 0) {
+        return;
+    }
+
+    if (consoleChannels.indexOf(channel) != -1 || (channel.endsWith(":stream") && consoleShowAssets)) {
+        await discord.sendMessage(consoleChannel.id, `${channel}: ` + message.replaceAll(reColor, ""));
+    }
+}
+
 async function init() {
     const token = GetConvar("discord_token", "");
 
@@ -110,7 +124,13 @@ async function init() {
     chatChannel = await getChannelFromConvar("discord_chat", "chat");
     if (chatChannel === null) {
         console.warn("No channel found for Chat with ID " + GetConvar("discord_chat", "0") + ", Chat Redirection is unavailable");
-        return;
+    }
+
+    consoleChannel = await getChannelFromConvar("discord_console", "console");
+    if (consoleChannel === null) {
+        console.warn("No channel found for Console with ID " + GetConvar("discord_console", "0") + ", Console Redirection is unavailable");
+    } else {
+        RegisterConsoleListener(handleConsoleMessage);
     }
 
     on("playerConnecting", handleJoinWhitelist);
