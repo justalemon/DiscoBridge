@@ -95,9 +95,13 @@ export class Discord {
         const payload: GatewayResponse = JSON.parse(asString);
 
         switch (payload.op) {
-            // dispatch
+            // Dispatch
             case 0:
                 this.#handleDispatch(payload.t, payload.d);
+                break;
+            // Heartbeat
+            case 1:
+                this.#performHeartbeat();
                 break;
             // Hello
             case 10:
