@@ -110,6 +110,10 @@ export class Discord {
             // Heartbeat ACK
             case 11:
                 break;
+            // Anything Else
+            default:
+                debug(`Received opcode ${payload.op}`);
+                break;
         }
     }
 
