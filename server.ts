@@ -40,7 +40,7 @@ async function handleChatMessage(source: number, author: string, message: string
     await discord.sendMessage(chatChannel.id, `${author} ${source}: ` + message.replaceAll(reColor, ""));
 }
 
-async function handleJoinWhitelist(playerName: string, setKickReason: SetKickReason, deferrals: Deferrals) {
+async function handleJoinWhitelist(playerName: string, _: SetKickReason, deferrals: Deferrals) {
     const src = source;
 
     if (!whitelist) {
