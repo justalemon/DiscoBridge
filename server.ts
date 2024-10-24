@@ -5,7 +5,6 @@ import { Deferrals, SetKickReason } from "./fxserver/types";
 
 const Delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 const reColor = new RegExp("\^[0-9]", "g");
-const whitelist = GetConvarInt("discord_whitelist", 0) != 0;
 const consoleChannels: string[] = JSON.parse(GetConvar("discord_consolechannels", `["resources", "svadhesive", "citizen-server-impl", "c-scripting-core", "script:citric"]`));
 const consoleShowAssets = GetConvarInt("discord_consoleassets", 0) != 0;
 
@@ -45,10 +44,6 @@ async function handleChatMessage(source: number, author: string, message: string
 
 async function handleJoinWhitelist(playerName: string, _: SetKickReason, deferrals: Deferrals) {
     const src = source;
-
-    if (!whitelist) {
-        return;
-    }
 
     deferrals.defer();
     deferrals.update(`Hi ${playerName}! We are fetching your Discord ID...`);
@@ -124,6 +119,8 @@ async function init() {
     chatChannel = await getChannelFromConvar("discord_chat", "chat");
     if (chatChannel === null) {
         console.warn("No channel found for Chat with ID " + GetConvar("discord_chat", "0") + ", Chat Redirection is unavailable");
+    } else {
+        onNet("chatMessage", handleChatMessage);
     }
 
     consoleChannel = await getChannelFromConvar("discord_console", "console");
@@ -133,7 +130,8 @@ async function init() {
         RegisterConsoleListener(handleConsoleMessage);
     }
 
-    on("playerConnecting", handleJoinWhitelist);
-    onNet("chatMessage", handleChatMessage);
+    if (GetConvarInt("discord_whitelist", 0) != 0) {
+        on("playerConnecting", handleJoinWhitelist);
+    }
 }
 init();
