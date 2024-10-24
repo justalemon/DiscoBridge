@@ -108,6 +108,10 @@ async function init() {
     }
 
     chatChannel = await getChannelFromConvar("discord_chat", "chat");
+    if (chatChannel === null) {
+        console.warn("No channel found for Chat with ID " + GetConvar("discord_chat", "0") + ", Chat Redirection is unavailable");
+        return;
+    }
 
     on("playerConnecting", handleJoinWhitelist);
     onNet("chatMessage", handleChatMessage);
