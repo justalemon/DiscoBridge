@@ -268,7 +268,7 @@ export class Discord {
             return null;
         }
 
-        const foundMember = guild.members.find(x => x.user.id == memberId);
+        const foundMember = guild.members.find(x => x.user && x.user.id == memberId);
 
         if (typeof(foundMember) !== "undefined") {
             return foundMember;
