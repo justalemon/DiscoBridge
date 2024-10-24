@@ -102,7 +102,11 @@ export class Discord {
     }
 
     #handleDispatch(type: string | null, payload: GatewayData | DiscordGuild, sequence: number | null) {
-        this.#last_sequence = sequence ?? 0;
+        if (typeof(sequence) === "number") {
+            this.#last_sequence = sequence;
+        } else {
+            console.warn(`Received missing sequence as part of dispatch of type ${type}`);
+        }
 
         if (type == "READY") {
             console.log("Bot is ready!");
