@@ -92,7 +92,7 @@ async function init() {
     const token = GetConvar("discord_token", "");
 
     if (token === null) {
-        console.error("Convar discord_token is not set, unable to start the bot.");
+        console.error("The Discord Token is not set. Please set discord_token and start the bot again.");
         StopResource(GetCurrentResourceName());
         return;
     }
