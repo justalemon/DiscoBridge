@@ -34,7 +34,7 @@ export class Discord {
 
     #connect() {
         if (this.#ws !== null) {
-
+            this.#close();
         }
 
         let reconnect = false;
@@ -61,6 +61,22 @@ export class Discord {
             this.#session_id = null;
             this.#last_sequence = null;
         }
+    }
+
+    #close() {
+        console.warn("Closing Websocket Connection");
+
+        this.#ws?.close(1000);
+        this.#ws = null;
+        this.#ready = false;
+
+        if (this.#interval !== null) {
+            clearInterval(this.#interval);
+        }
+
+        this.#session_id = null;
+        this.#resume_gateway_url = null;
+        this.#last_sequence = null;
     }
 
     #identify() {
