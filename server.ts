@@ -48,28 +48,28 @@ async function handleJoinWhitelist(playerName: string, setKickReason: SetKickRea
     }
 
     deferrals.defer();
-    deferrals.update("Fetching your Discord ID...");
+    deferrals.update(`Hi ${playerName}! We are fetching your Discord ID...`);
 
     await Delay(1);
 
     const snowflake = GetPlayerIdentifierByType(src.toString(), "discord");
 
     if (snowflake == null) {
-        deferrals.done("Your Discord ID is not available. Please open the Discord app and restart the game.");
+        deferrals.done(`Hey ${playerName}! Looks like you didn't opened Discord before starting the game. Please open Discord and restart your game.`);
         return;
     }
-    
+
     deferrals.update("Fetching your Discord details...");
 
     if (guild == null) {
-        deferrals.done("The Discord server is not available, please contact a staff member.");
+        deferrals.done(`Hey ${playerName}! Looks like the Discord server is not available, please contact a staff member.`);
         return;
     }
 
     const member = await discord?.getMember(guild.id, snowflake.replace("discord:", ""));
 
     if (member == null) {
-        deferrals.done("Please join our Discord server so you can play online.");
+        deferrals.done("Hey ${playerName}! Looks like yoou are not in our Discord Server. Please join so you can play.");
         return;
     }
 
