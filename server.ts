@@ -13,24 +13,27 @@ let guild: DiscordGuild | null = null;
 let chatChannel: DiscordChannel | null = null;
 let consoleChannel: DiscordChannel | null = null;
 
-async function getChannelFromConvar(convar: string, purpose: string) {
-    const channelId = GetConvarInt(convar, 0);
-
-    if (discord === null || channelId === 0 || guild === null) {
-        return null;
+async function getChannelFromConvar(convar: string) {
+    if (discord === null) {
+        throw new Error("Discord Client is not available, unable to obtain channel.");
     }
 
     if (guild === null) {
+        throw new Error("Discord Guild is not available or found, unable to obtain channel.");
+    }
+
+    const channelId = GetConvar(convar, "");
+
+    if (channelId.length === 0) {
         return null;
     }
 
-    const channel = await discord.getChannel(guild.id, channelId.toString());
+    const channel = await discord.getChannel(guild.id, channelId);
 
     if (channel === null || channel.type !== DiscordChannelType.GuildText) {
         return null;
     }
 
-    console.log(`Using channel ${channel.name} (${channel.id}) as the ${purpose} channel`);
     return channel;
 }
 
