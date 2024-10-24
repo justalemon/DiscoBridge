@@ -2,6 +2,7 @@ import WebSocket, { Data } from "ws";
 import { request } from "./rest";
 import { DiscordGuild } from "./types/guild";
 import { DiscordGuildMember } from "./types/guild_member";
+import { DiscordIntents } from "./types/intents";
 import { DiscordMessage } from "./types/message";
 import { GatewayData } from "./gateway/data";
 import { GatewayHello } from "./gateway/hello";
@@ -77,7 +78,7 @@ export class Discord {
                     browser: `DiscoSync for fxserver`,
                     device: `DiscoSync for fxserver`
                 },
-                intents: 3
+                intents: DiscordIntents.Guilds | DiscordIntents.GuildMembers
             }
         }
 
