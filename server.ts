@@ -2,6 +2,7 @@ import { Discord } from "./discord/client";
 import { DiscordChannel, DiscordChannelType } from "./discord/types/channel";
 import { DiscordGuild } from "./discord/types/guild";
 import { Deferrals, SetKickReason } from "./fxserver/types";
+import { debug } from "./tools";
 
 const Delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 const reColor = new RegExp("\^[0-9]", "g");
@@ -109,6 +110,11 @@ async function init() {
     discord = new Discord(token);
 
     while (!discord.isReady) {
+        if (discord.terminated){
+            debug("Discord connection terminated, stopping resource");
+            return;
+        }
+
         await Delay(0);
     }
 
