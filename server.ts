@@ -1,5 +1,6 @@
 import { Discord } from "./discord/client";
 import { DiscordChannel, DiscordChannelType } from "./discord/types/channel";
+import { DiscordGuild } from "./discord/types/guild";
 import { Deferrals, SetKickReason } from "./fxserver/types";
 
 const Delay = (ms: number) => new Promise(res => setTimeout(res, ms));
@@ -7,17 +8,15 @@ const reColor = new RegExp("\^[0-9]", "g");
 const whitelist = GetConvarInt("discord_whitelist", 0) != 0;
 
 let discord: Discord | null = null;
+let guild: DiscordGuild | null = null;
 let chatChannel: DiscordChannel | null = null;
 
 async function getChannelFromConvar(convar: string, purpose: string) {
     const channelId = GetConvarInt(convar, 0);
-    const guildId = GetConvarInt("discord_guild", 0);
 
-    if (discord === null || channelId === 0 || guildId === 0) {
+    if (discord === null || channelId === 0 || guild === null) {
         return null;
     }
-
-    const guild = await discord.getGuild(guildId.toString());
 
     if (guild === null) {
         return null;
@@ -62,8 +61,6 @@ async function handleJoinWhitelist(playerName: string, setKickReason: SetKickRea
     
     deferrals.update("Fetching your Discord details...");
 
-    const guild = await discord?.getGuild(GetConvar("discord_guild", ""));
-
     if (guild == null) {
         deferrals.done("The Discord server is not available, please contact a staff member.");
         return;
@@ -101,6 +98,13 @@ async function init() {
 
     while (!discord.isReady) {
         await Delay(0);
+    }
+
+    guild = await discord.getGuild(GetConvar("discord_guild", "0"));
+    if (guild === null) {
+        console.error("Unable to find guild with id " + GetConvar("discord_guild", "0"));
+        StopResource(GetCurrentResourceName());
+        return;
     }
 
     chatChannel = await getChannelFromConvar("discord_chat", "chat");
