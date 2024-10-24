@@ -34,11 +34,11 @@ async function getChannelFromConvar(convar: string, purpose: string) {
 }
 
 async function handleChatMessage(source: number, author: string, message: string) {
-    if (discord == null || chatChannel === null) {
+    if (discord === null || chatChannel === null) {
         return;
     }
 
-    await discord.sendMessage(chatChannel.id, `${author}: ` + message.replaceAll(reColor, ""));
+    await discord.sendMessage(chatChannel.id, `${author} ${source}: ` + message.replaceAll(reColor, ""));
 }
 
 async function handleJoinWhitelist(playerName: string, setKickReason: SetKickReason, deferrals: Deferrals) {
