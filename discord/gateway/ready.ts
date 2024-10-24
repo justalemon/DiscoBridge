@@ -3,7 +3,7 @@ import { DiscordUser } from "../types/user";
 import { DiscordGuildBasic } from "../types/guild_basic";
 import { DiscordApplicationBasic } from "../types/application_basic";
 
-interface GatewayReady extends GatewayData {
+export interface GatewayReady extends GatewayData {
     v: 10 | 9 | 8 | 7 | 6;
     user_settings: any,
     user: DiscordUser,
