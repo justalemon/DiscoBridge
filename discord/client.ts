@@ -244,15 +244,30 @@ export class Discord {
     }
 
     #addGuildToCache(guild: DiscordGuild) {
-        const current = this.#guilds.filter(x => x.id == guild.id)[0];
+        debug(`Adding guild ${guild.id} to the cache`);
 
-        if (typeof(current) !== "undefined") {
+        const current = this.#guilds.filter(x => x.id == guild.id)[0] ?? null;
+        const members = current?.members ?? [];
+
+        if (current !== null) {
             const index = this.#guilds.indexOf(current);
             this.#guilds.splice(index, 1);
+            debug(`Removed existing version of guild ${guild.id}`);
         }
 
+        for (const member of guild.members) {
+            const index = members.indexOf(member);
+
+            if (index !== -1) {
+                members.splice(index, 1);
+            }
+
+            members.push(member);
+        }
+
+        guild.members = members;
         this.#guilds.push(guild);
-        console.log("Added guild %s", guild.name);
+        debug(`Added guild ${guild.name} with ${members.length} members`);
     }
 
     #getMemberExisting(guildId: string, memberId: string) {
