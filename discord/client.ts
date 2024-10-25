@@ -174,7 +174,9 @@ export class Discord {
                 const existing = guild.members.find(x => x.user && member.user && x.user.id === member.user.id) ?? null;
 
                 if (existing !== null) {
-                    guild.members.splice(guild.members.indexOf(existing));
+                    const index = guild.members.indexOf(existing);
+                    debug(`Removing existing member ${existing.user?.id} from guild ${guild.id} (i = ${index})`)
+                    guild.members.splice(index, 1);
                 }
 
                 guild.members.push(member);
