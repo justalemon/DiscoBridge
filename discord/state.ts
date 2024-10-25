@@ -4,5 +4,5 @@ export enum ConnectionState {
     Connecting = 1,
     Connected = 2,
     Identified = 3,
-    Ready = 5
+    Ready = 4
 }
