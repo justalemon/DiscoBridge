@@ -156,6 +156,9 @@ export class Discord {
             }
         } else if (type == "GUILD_MEMBERS_CHUNK") {
             const chunk = payload as DiscordGuildMemberChunk;
+
+            debug(`Receiving chunk of guild ${chunk.guild_id} with ${chunk.members.length} members (${chunk.chunk_index}/${chunk.chunk_count})`);
+
             const guild = this.#guilds.find(x => x.id == chunk.guild_id) ?? null;
 
             if (guild === null) {
@@ -256,6 +259,7 @@ export class Discord {
         const foundGuild = this.#guilds.find(x => x.id == guildId) ?? null;
 
         if (foundGuild === null) {
+            debug(`Guild with id ${guildId} was not found for member ${memberId}`);
             return null;
         }
         
