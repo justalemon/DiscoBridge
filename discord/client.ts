@@ -1,5 +1,6 @@
 import WebSocket, { Data } from "ws";
 import { request } from "./rest";
+import { GuildMemberUpdate } from "./events/guild_member_update";
 import { DiscordGuild } from "./types/guild";
 import { DiscordGuildMember } from "./types/guild_member";
 import { DiscordIntents } from "./types/intents";
@@ -21,6 +22,8 @@ export class Discord {
     #last_sequence: number | null = null;
     #ready: boolean = false;
     #terminated: boolean = false;
+
+    #guildMemberUpdate: GuildMemberUpdate[] = [];
 
     #guilds: DiscordGuild[] = [];
 
@@ -124,7 +127,7 @@ export class Discord {
         this.#interval = setInterval(this.#performHeartbeat.bind(this), this.#heartbeat);
     }
 
-    #handleDispatch(type: string | null, payload: GatewayData | DiscordGuild, sequence: number | null) {
+    #handleDispatch(type: string | null, payload: GatewayData | DiscordGuild | DiscordGuildMember, sequence: number | null) {
         if (typeof(sequence) === "number") {
             this.#last_sequence = sequence;
         } else {
@@ -141,6 +144,16 @@ export class Discord {
             const guild = payload as DiscordGuild;
             this.#addGuildToCache(guild);
             return;
+        } else if (type == "GUILD_MEMBER_UPDATE") {
+            const after = payload as DiscordGuildMember;
+            const before = this.#getMemberExisting(after.guild_id ?? "", after.user?.id ?? "");
+            if (before) {
+                for (const a of this.#guildMemberUpdate) {
+                    a(before, after);
+                }
+            } else {
+                console.warn(`Received GUILD_MEMBER_UPDATE but there is no member with ID ${after.user?.id}`);
+            }
         } else {
             debug("Unknown payload type: %s", type);
             debug(payload);
@@ -208,6 +221,20 @@ export class Discord {
 
         this.#guilds.push(guild);
         console.log("Added guild %s", guild.name);
+    }
+
+    #getMemberExisting(guildId: string, memberId: string) {
+        const foundGuild = this.#guilds.find(x => x.id == guildId) ?? null;
+
+        if (foundGuild === null) {
+            return null;
+        }
+        
+        return foundGuild.members.find(x => x.user && x.user.id == memberId);
+    }
+
+    on(event: "guildMemberUpdate", listener: GuildMemberUpdate) {
+        this.#guildMemberUpdate.push(listener);
     }
 
     async getGuild(guildId: string) {
