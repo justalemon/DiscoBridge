@@ -3,3 +3,5 @@ export function debug(...objs: any[]) {
         console.log("Debug: ", ...objs);
     }
 }
+
+export const Delay = (ms: number) => new Promise(res => setTimeout(res, ms));

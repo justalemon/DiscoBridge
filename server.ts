@@ -3,9 +3,8 @@ import { ConnectionState } from "./discord/state";
 import { DiscordChannel, DiscordChannelType } from "./discord/types/channel";
 import { DiscordGuild } from "./discord/types/guild";
 import { Deferrals, SetKickReason } from "./fxserver/types";
-import { debug } from "./tools";
+import { debug, Delay } from "./tools";
 
-const Delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 const reColor = new RegExp("\^[0-9]", "g");
 const consoleChannels: string[] = JSON.parse(GetConvar("discord_console_channels", `[]`));
 const consoleShowAssets = GetConvarInt("discord_console_assets", 0) != 0;
