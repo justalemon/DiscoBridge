@@ -233,6 +233,9 @@ export class Discord {
         console.error(`Gateway Connection Closed: Code ${code} (${reason})`);
         this.#close();
         this.#current_state = ConnectionState.Terminated;
+        if (code === 1000 || code === 1001) {
+            this.#connect();
+        }
     }
 
     #handleOpen() {
