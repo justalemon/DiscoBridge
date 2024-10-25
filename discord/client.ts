@@ -1,5 +1,6 @@
 import WebSocket, { Data } from "ws";
 import { request } from "./rest";
+import { ConnectionState } from "./state";
 import { GuildMemberUpdate } from "./events/guild_member_update";
 import { DiscordGuild } from "./types/guild";
 import { DiscordGuildMember } from "./types/guild_member";
@@ -20,8 +21,7 @@ export class Discord {
     #session_id: string | null = null;
     #resume_gateway_url: string | null = null;
     #last_sequence: number | null = null;
-    #ready: boolean = false;
-    #terminated: boolean = false;
+    #current_state: ConnectionState = ConnectionState.NotConnected;
 
     #guildMemberUpdate: GuildMemberUpdate[] = [];
 
@@ -32,15 +32,13 @@ export class Discord {
         this.#connect();
     }
 
-    get isReady() : boolean {
-        return this.#ready;
-    }
-
-    get terminated() : boolean {
-        return this.#terminated;
+    get state() {
+        return this.#current_state;
     }
 
     #connect() {
+        this.#current_state = ConnectionState.Connecting;
+
         if (this.#ws !== null) {
             this.#close();
         }
@@ -56,7 +54,7 @@ export class Discord {
 
         this.#ws.on("close", (c, r) => this.#handleClose(c, r.toString()));
         this.#ws.on("message", (d) => this.#handleMessage(d));
-        this.#ws.on("open", this.#handleOpen);
+        this.#ws.on("open", () => this.#handleOpen());
 
         if (reconnect) {
             this.#ws?.send(JSON.stringify({
@@ -77,7 +75,7 @@ export class Discord {
 
         this.#ws?.close(1000);
         this.#ws = null;
-        this.#ready = false;
+        this.#current_state = ConnectionState.Terminated;
 
         if (this.#interval !== null) {
             clearInterval(this.#interval);
@@ -139,7 +137,7 @@ export class Discord {
             const data = payload as GatewayReady;
             this.#session_id = data.session_id;
             this.#resume_gateway_url = data.resume_gateway_url;
-            this.#ready = true;
+            this.#current_state = ConnectionState.Ready;
         } else if (type == "GUILD_CREATE") {
             const guild = payload as DiscordGuild;
             this.#addGuildToCache(guild);
@@ -198,15 +196,16 @@ export class Discord {
     #handleClose(code: number, reason: string) {
         console.error(`Gateway Connection Closed: Code ${code} (${reason})`);
         this.#close();
-        this.#terminated = true;
+        this.#current_state = ConnectionState.Terminated;
     }
 
     #handleOpen() {
+        this.#current_state = ConnectionState.Connected;
         debug("Discord Websocket Connection is Open");
     }
 
     #ensureReady() {
-        if (!this.#ready) {
+        if (this.#current_state !== ConnectionState.Ready) {
             throw new Error("The bot is not ready to perform operations.");
         }
     }
@@ -235,6 +234,10 @@ export class Discord {
 
     on(event: "guildMemberUpdate", listener: GuildMemberUpdate) {
         this.#guildMemberUpdate.push(listener);
+    }
+
+    async requestMembers(guildId: string) {
+        
     }
 
     async getGuild(guildId: string) {
