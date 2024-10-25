@@ -4,6 +4,7 @@ import { ConnectionState } from "./state";
 import { GuildMemberUpdate } from "./events/guild_member_update";
 import { DiscordGuild } from "./types/guild";
 import { DiscordGuildMember } from "./types/guild_member";
+import { DiscordGuildMemberChunk } from "./types/guild_member_chunk";
 import { DiscordIntents } from "./types/intents";
 import { DiscordMessage } from "./types/message";
 import { GatewayData } from "./gateway/data";
@@ -11,7 +12,7 @@ import { GatewayHello } from "./gateway/hello";
 import { GatewayReady } from "./gateway/ready";
 import { GatewayResponse } from "./gateway/response";
 import { DiscordChannel } from "./types/channel";
-import { debug } from "../tools";
+import { debug, Delay } from "../tools";
 
 export class Discord {
     #ws: WebSocket | null = null;
@@ -25,6 +26,7 @@ export class Discord {
 
     #guildMemberUpdate: GuildMemberUpdate[] = [];
 
+    #memberRequests: string[] = [];
     #guilds: DiscordGuild[] = [];
 
     constructor(token: string) {
@@ -125,7 +127,7 @@ export class Discord {
         this.#interval = setInterval(this.#performHeartbeat.bind(this), this.#heartbeat);
     }
 
-    #handleDispatch(type: string | null, payload: GatewayData | DiscordGuild | DiscordGuildMember, sequence: number | null) {
+    #handleDispatch(type: string | null, payload: GatewayData | DiscordGuild | DiscordGuildMember | DiscordGuildMemberChunk, sequence: number | null) {
         if (typeof(sequence) === "number") {
             this.#last_sequence = sequence;
         } else {
@@ -151,6 +153,34 @@ export class Discord {
                 }
             } else {
                 console.warn(`Received GUILD_MEMBER_UPDATE but there is no member with ID ${after.user?.id}`);
+            }
+        } else if (type == "GUILD_MEMBERS_CHUNK") {
+            const chunk = payload as DiscordGuildMemberChunk;
+            const guild = this.#guilds.find(x => x.id == chunk.guild_id) ?? null;
+
+            if (guild === null) {
+                throw new Error(`Unable to update Members for Guild ${chunk.guild_id} because it doesn't exists`);
+            }
+
+            for (const member of chunk.members) {
+                if (typeof(member.user) === "undefined") {
+                    console.warn("Received Member without a User, skipping...");
+                    continue;
+                }
+
+                const existing = guild.members.find(x => x.user && member.user && x.user.id === member.user.id) ?? null;
+
+                if (existing !== null) {
+                    guild.members.splice(guild.members.indexOf(existing));
+                }
+
+                guild.members.push(member);
+                debug(`Received chunked member ${member.user.id}`);
+            }
+
+            if (chunk.chunk_index === chunk.chunk_count - 1) {
+                this.#memberRequests.splice(this.#memberRequests.indexOf(chunk.guild_id), 1);
+                debug(`Finished receiving members for guild ${chunk.guild_id}`);
             }
         } else {
             debug("Unknown payload type: %s", type);
@@ -237,7 +267,25 @@ export class Discord {
     }
 
     async requestMembers(guildId: string) {
+        if (this.#memberRequests.indexOf(guildId) !== -1) {
+            throw new Error(`Members of Guild ${guildId} are already being fetched.`);
+        }
+
+        debug(`Requesting members of guild ${guildId}`);
+        this.#ws?.send(JSON.stringify({
+            op: 8,
+            d: {
+                guild_id: guildId,
+                query: "",
+                limit: 0
+            }
+        }));
         
+        this.#memberRequests.push(guildId);
+
+        while (this.#memberRequests.indexOf(guildId) !== -1) {
+            await Delay(0);
+        }
     }
 
     async getGuild(guildId: string) {

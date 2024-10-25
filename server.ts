@@ -125,6 +125,8 @@ async function init() {
         return;
     }
 
+    await discord.requestMembers(guild.id);
+
     chatChannel = await getChannelFromConvar("discord_channel_chat");
     if (chatChannel === null) {
         console.warn("No channel found for Chat with ID " + GetConvar("discord_channel_chat", "0") + ", Chat Redirection is unavailable");
