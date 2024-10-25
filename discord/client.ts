@@ -325,7 +325,7 @@ export class Discord {
             return null; 
         }
 
-        this.#guilds.push(fetchedGuild);
+        this.#addGuildToCache(fetchedGuild);
         return fetchedGuild;
     }
 
