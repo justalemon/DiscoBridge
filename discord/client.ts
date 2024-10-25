@@ -142,6 +142,7 @@ export class Discord {
             this.#current_state = ConnectionState.Ready;
         } else if (type == "GUILD_CREATE") {
             const guild = payload as DiscordGuild;
+            debug(`Received Guild Created for guild ${guild.id}`);
             this.#addGuildToCache(guild);
             return;
         } else if (type == "GUILD_MEMBER_UPDATE") {
@@ -180,12 +181,12 @@ export class Discord {
                 }
 
                 guild.members.push(member);
-                debug(`Received chunked member ${member.user.id}`);
+                debug(`Received chunked member ${member.user.id}, total is ${guild.members.length}`);
             }
 
             if (chunk.chunk_index === chunk.chunk_count - 1) {
                 this.#memberRequests.splice(this.#memberRequests.indexOf(chunk.guild_id), 1);
-                debug(`Finished receiving members for guild ${chunk.guild_id}`);
+                debug(`Finished receiving members for guild ${chunk.guild_id}, total member count is ${guild.members.length}`);
             }
         } else {
             debug("Unknown payload type: %s", type);
