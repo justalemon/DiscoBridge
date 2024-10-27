@@ -6,8 +6,8 @@ import { Deferrals, SetKickReason } from "./fxserver/types";
 import { debug, Delay } from "./tools";
 
 const reColor = new RegExp("\^[0-9]", "g");
-const consoleChannels: string[] = JSON.parse(GetConvar("discord_console_channels", `[]`));
-const consoleShowAssets = GetConvarInt("discord_console_assets", 0) != 0;
+const consoleChannels: string[] = JSON.parse(GetConvar("discobridge_console_channels", `[]`));
+const consoleShowAssets = GetConvarInt("discobridge_console_assets", 0) != 0;
 
 let discord: Discord | null = null;
 let guild: DiscordGuild | null = null;
@@ -90,10 +90,10 @@ async function handleConsoleMessage(channel: string, message: string) {
 }
 
 async function init() {
-    const token = GetConvar("discord_token", "");
+    const token = GetConvar("discobridge_token", "");
 
     if (token === null) {
-        console.error("The Discord Token is not set. Please set discord_token and start the bot again.");
+        console.error("The Discord Token is not set. Please set discobridge_token and start the bot again.");
         StopResource(GetCurrentResourceName());
         return;
     }
@@ -118,32 +118,32 @@ async function init() {
         await Delay(0);
     }
 
-    guild = await discord.getGuild(GetConvar("discord_guild", "0"));
+    guild = await discord.getGuild(GetConvar("discobridge_guild", "0"));
     if (guild === null) {
-        console.error("Unable to find guild with id " + GetConvar("discord_guild", "0"));
+        console.error("Unable to find guild with id " + GetConvar("discobridge_guild", "0"));
         StopResource(GetCurrentResourceName());
         return;
     }
 
     await discord.requestMembers(guild.id);
 
-    chatChannel = await getChannelFromConvar("discord_channel_chat");
+    chatChannel = await getChannelFromConvar("discobridge_channel_chat");
     if (chatChannel === null) {
-        console.warn("No channel found for Chat with ID " + GetConvar("discord_channel_chat", "0") + ", Chat Redirection is unavailable");
+        console.warn("No channel found for Chat with ID " + GetConvar("discobridge_channel_chat", "0") + ", Chat Redirection is unavailable");
     } else {
-        console.log("Using channel " + GetConvar("discord_channel_chat", "") + " for the Chat");
+        console.log("Using channel " + GetConvar("discobridge_channel_chat", "") + " for the Chat");
         onNet("chatMessage", handleChatMessage);
     }
 
-    consoleChannel = await getChannelFromConvar("discord_channel_console");
+    consoleChannel = await getChannelFromConvar("discobridge_channel_console");
     if (consoleChannel === null) {
-        console.warn("No channel found for Console with ID " + GetConvar("discord_channel_console", "0") + ", Console Redirection is unavailable");
+        console.warn("No channel found for Console with ID " + GetConvar("discobridge_channel_console", "0") + ", Console Redirection is unavailable");
     } else {
-        console.log("Using channel " + GetConvar("discord_channel_console", "") + " for the Console");
+        console.log("Using channel " + GetConvar("discobridge_channel_console", "") + " for the Console");
         RegisterConsoleListener(handleConsoleMessage);
     }
 
-    if (GetConvarInt("discord_whitelist_enabled", 0) != 0) {
+    if (GetConvarInt("discobridge_whitelist_enabled", 0) != 0) {
         console.log("Enabling Discord Join Whitelist");
         on("playerConnecting", handleJoinWhitelist);
     }
