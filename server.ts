@@ -2,10 +2,12 @@ import { Discord } from "./discord/client";
 import { ConnectionState } from "./discord/state";
 import { DiscordChannel, DiscordChannelType } from "./discord/types/channel";
 import { DiscordGuild } from "./discord/types/guild";
+import { DiscordGuildMember } from "./discord/types/guild_member";
 import { Deferrals, SetKickReason } from "./fxserver/types";
 import { debug, Delay } from "./tools";
 
 const reColor = new RegExp("\^[0-9]", "g");
+const roles: Map<string, string> = new Map<string, string>(Object.entries(JSON.parse(GetConvar("discobridge_roles", "{}"))));
 const consoleChannels: string[] = JSON.parse(GetConvar("discobridge_console_channels", `[]`));
 const consoleShowAssets = GetConvarInt("discobridge_console_assets", 0) != 0;
 
@@ -13,6 +15,50 @@ let discord: Discord | null = null;
 let guild: DiscordGuild | null = null;
 let chatChannel: DiscordChannel | null = null;
 let consoleChannel: DiscordChannel | null = null;
+
+function getPlayerByDiscordIdentifier(id: string) {
+    for (let i = 0; i < GetNumPlayerIndices(); i++) {
+        const player = GetPlayerFromIndex(i);
+        const discord = GetPlayerIdentifierByType(player, "discord").replace("discord:", "");
+        
+        if (id === discord) {
+            return player;
+        }
+    }
+
+    return null;
+}
+
+async function updateRolesOfMember(_: DiscordGuildMember, member: DiscordGuildMember) {
+    setImmediate(() => {
+        if (typeof(member.user) === "undefined") {
+            console.warn("Unable to process");
+            return;
+        }
+
+        const player = getPlayerByDiscordIdentifier(member.user.id);
+
+        if (player === null) {
+            return;
+        }
+
+        for (const role of member.roles) {
+            const principal = roles.get(role);
+
+            if (typeof principal == "undefined") {
+                continue;
+            }
+
+            // remove principals just in case
+            ExecuteCommand(`remove_principal identifier.discord:${member.user.id} ${principal}`);
+
+            if (IsPlayerAceAllowed(player, principal)) {
+                ExecuteCommand(`add_principal identifier.discord:${member.user.id} ${principal}`);
+                debug(`Added principal ${principal} to player ${player}`);
+            }
+        }
+    });
+}
 
 async function getChannelFromConvar(convar: string) {
     if (discord === null) {
@@ -126,6 +172,10 @@ async function init() {
     }
 
     await discord.requestMembers(guild.id);
+
+    if (roles.size > 0) {
+        discord.on("guildMemberUpdate", updateRolesOfMember)
+    }
 
     chatChannel = await getChannelFromConvar("discobridge_channel_chat");
     if (chatChannel === null) {
