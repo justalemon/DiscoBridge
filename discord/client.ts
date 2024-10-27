@@ -256,7 +256,12 @@ export class Discord {
         debug(`Adding guild ${guild.id} to the cache`);
 
         const current = this.#guilds.filter(x => x.id == guild.id)[0] ?? null;
-        const members = current?.members ?? [];
+        let members = current?.members ?? [];
+
+        if (!Array.isArray(members)){
+            console.warn(`Guild ${guild.id} received with no valid member list (${typeof(members)})`);
+            members = [];
+        }
 
         if (current !== null) {
             const index = this.#guilds.indexOf(current);
