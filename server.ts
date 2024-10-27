@@ -92,7 +92,7 @@ async function handleConsoleMessage(channel: string, message: string) {
 async function init() {
     const token = GetConvar("discobridge_token", "");
 
-    if (token === null) {
+    if (token === null || token.length === 0) {
         console.error("The Discord Token is not set. Please set discobridge_token and start the bot again.");
         StopResource(GetCurrentResourceName());
         return;
