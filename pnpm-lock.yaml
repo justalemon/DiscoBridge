@@ -15,8 +15,8 @@ importers:
         specifier: 2.0.10488-1
         version: 2.0.10488-1
       '@types/node':
-        specifier: 22.8.0
-        version: 22.8.0
+        specifier: 22.8.2
+        version: 22.8.2
       '@types/ws':
         specifier: ^8.5.12
         version: 8.5.12
@@ -94,8 +94,8 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/node@22.8.0':
-    resolution: {integrity: sha512-84rafSBHC/z1i1E3p0cJwKA+CfYDNSXX9WSZBRopjIzLET8oNt6ht2tei4C7izwDeEiLLfdeSVBv1egOH916hg==}
+  '@types/node@22.8.2':
+    resolution: {integrity: sha512-NzaRNFV+FZkvK/KLCsNdTvID0SThyrs5SHB6tsD/lajr22FGC73N2QeDPM2wHtVde8mgcXuSsHQkH5cX1pbPLw==}
 
   '@types/ws@8.5.12':
     resolution: {integrity: sha512-3tPRkv1EtkDpzlgyKyI8pGsGZAGPEaXeu0DOj5DI25Ja91bdAYddYHbADRYVrZMRbfW+1l5YwXVDKohDJNQxkQ==}
@@ -789,13 +789,13 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/node@22.8.0':
+  '@types/node@22.8.2':
     dependencies:
       undici-types: 6.19.8
 
   '@types/ws@8.5.12':
     dependencies:
-      '@types/node': 22.8.0
+      '@types/node': 22.8.2
 
   '@webassemblyjs/ast@1.12.1':
     dependencies:
@@ -1128,7 +1128,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 22.8.0
+      '@types/node': 22.8.2
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
