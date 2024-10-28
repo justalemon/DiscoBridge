@@ -5,6 +5,7 @@ import { DiscordGuild } from "./discord/types/guild";
 import { DiscordGuildMember } from "./discord/types/guild_member";
 import { Deferrals, SetKickReason } from "./fxserver/types";
 import { debug, Delay } from "./tools";
+import { getPlayerByDiscordIdentifier } from "./fxserver/tools";
 
 const reColor = new RegExp("\^[0-9]", "g");
 const roles: Map<string, string> = new Map<string, string>(Object.entries(JSON.parse(GetConvar("discobridge_roles", "{}"))));
@@ -15,19 +16,6 @@ let discord: Discord | null = null;
 let guild: DiscordGuild | null = null;
 let chatChannel: DiscordChannel | null = null;
 let consoleChannel: DiscordChannel | null = null;
-
-function getPlayerByDiscordIdentifier(id: string) {
-    for (let i = 0; i < GetNumPlayerIndices(); i++) {
-        const player = GetPlayerFromIndex(i);
-        const discord = GetPlayerIdentifierByType(player, "discord").replace("discord:", "");
-        
-        if (id === discord) {
-            return player;
-        }
-    }
-
-    return null;
-}
 
 async function updateRolesOfMember(_: DiscordGuildMember, member: DiscordGuildMember) {
     setImmediate(() => {
