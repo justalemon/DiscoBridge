@@ -2,6 +2,7 @@ import WebSocket, { Data } from "ws";
 import { request } from "./rest";
 import { ConnectionState } from "./state";
 import { GuildMemberUpdate } from "./events/guild_member_update";
+import { MessageCreate } from "./events/message_create";
 import { DiscordGuild } from "./types/guild";
 import { DiscordGuildMember } from "./types/guild_member";
 import { DiscordGuildMemberChunk } from "./types/guild_member_chunk";
@@ -25,6 +26,7 @@ export class Discord {
     #current_state: ConnectionState = ConnectionState.NotConnected;
 
     #guildMemberUpdate: GuildMemberUpdate[] = [];
+    #messageCreate: MessageCreate[] = [];
 
     #memberRequests: string[] = [];
     #guilds: DiscordGuild[] = [];
@@ -295,8 +297,17 @@ export class Discord {
         return foundGuild.members.find(x => x.user && x.user.id == memberId);
     }
 
-    on(event: "guildMemberUpdate", listener: GuildMemberUpdate) {
-        this.#guildMemberUpdate.push(listener);
+    on(event: "guildMemberUpdate", listener: GuildMemberUpdate): void;
+    on(event: "messageCreate", listener: MessageCreate): void;
+    on(event: string, listener: any) {
+        switch (event) {
+            case "guildMemberUpdate":
+                this.#guildMemberUpdate.push(listener);
+                break;
+            case "messageCreate":
+                this.#messageCreate.push(listener);
+                break;
+        }
     }
 
     async requestMembers(guildId: string) {
