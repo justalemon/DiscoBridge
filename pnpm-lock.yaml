@@ -7,7 +7,7 @@ settings:
 importers:
 
   .:
-    dependencies:
+    devDependencies:
       '@citizenfx/client':
         specifier: 2.0.10543-1
         version: 2.0.10543-1

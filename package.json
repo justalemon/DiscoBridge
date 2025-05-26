@@ -14,7 +14,8 @@
     "keywords": [],
     "author": "",
     "license": "MIT",
-    "dependencies": {
+    "dependencies": {},
+    "devDependencies": {
         "@citizenfx/client": "2.0.10543-1",
         "@citizenfx/server": "2.0.10488-1",
         "@types/node": "22.13.4",
