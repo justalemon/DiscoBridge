@@ -18,7 +18,7 @@
     "devDependencies": {
         "@citizenfx/client": "2.0.10543-1",
         "@citizenfx/server": "2.0.10488-1",
-        "@types/node": "26.1.0",
+        "@types/node": "26.1.1",
         "@types/ws": "^8.18.1",
         "axios": "^1.18.1",
         "copy-webpack-plugin": "^13.0.1",
