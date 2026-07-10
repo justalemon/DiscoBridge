@@ -24,7 +24,7 @@
         "copy-webpack-plugin": "^13.0.1",
         "ts-loader": "^9.6.2",
         "webpack": "^5.108.4",
-        "webpack-cli": "^6.0.1",
+        "webpack-cli": "^7.2.1",
         "ws": "^8.21.0"
     },
     "private": false
