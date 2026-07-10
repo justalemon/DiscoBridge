@@ -22,7 +22,7 @@
         "@types/ws": "^8.18.1",
         "axios": "^1.18.1",
         "copy-webpack-plugin": "^13.0.1",
-        "ts-loader": "^9.5.2",
+        "ts-loader": "^9.6.2",
         "webpack": "^5.108.4",
         "webpack-cli": "^6.0.1",
         "ws": "^8.21.0"
