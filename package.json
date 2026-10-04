@@ -19,7 +19,7 @@
         "@citizenfx/client": "2.0.10543-1",
         "@citizenfx/server": "2.0.10488-1",
         "@types/node": "26.6.3",
-        "@types/ws": "^8.18.1",
+        "@types/ws": "^8.18.2",
         "axios": "^1.20.0",
         "copy-webpack-plugin": "^13.0.1",
         "ts-loader": "^9.6.2",
